@@ -7,6 +7,17 @@ import postRoutes from './routes/posts';
 // create an express app
 const app = express();
 
+// connect app to mongoose
+mongoose
+	.connect(config.MONGO_URL, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+		useFindAndModify: false,
+		useCreateIndex: true,
+	})
+	.then(() => console.log('Connected to MongoDB database'))
+	.catch(error => console.log(`Failed to connect to database: ${error.message}`));
+
 // enable json body parser
 app.use(express.json({ limit: '30mb' }));
 
@@ -18,17 +29,6 @@ app.use(cors());
 
 // applying routes related to posts
 app.use('/posts', postRoutes);
-
-// connect app to mongoose
-mongoose
-	.connect(config.MONGO_URL, {
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
-		useFindAndModify: false,
-		useCreateIndex: true,
-	})
-	.then(() => console.log('Connected to MongoDB database'))
-	.catch(error => console.log(`Failed to connect to database: ${error.message}`));
 
 // listen for requests on the specified port
 app.listen(config.PORT, () => {
