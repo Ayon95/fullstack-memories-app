@@ -2,6 +2,7 @@ import config from './utils/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
+import postRoutes from './routes/posts';
 
 // create an express app
 const app = express();
@@ -15,9 +16,12 @@ app.use(express.urlencoded({ limit: '30mb', extended: true }));
 // enable CORS
 app.use(cors());
 
+// applying routes related to posts
+app.use('/posts', postRoutes);
+
 // connect app to mongoose
 mongoose
-	.connect(config.MONGO_URL!, {
+	.connect(config.MONGO_URL, {
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 		useFindAndModify: false,

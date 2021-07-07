@@ -1,8 +1,11 @@
 import 'dotenv/config';
 
+const PORT: number = Number.parseFloat(process.env.PORT!);
+const MONGO_URL = process.env.MONGO_URL!;
+
 const config = {
-	PORT: process.env.PORT,
-	MONGO_URL: process.env.MONGO_URL,
+	PORT,
+	MONGO_URL,
 };
 
 export default config;
