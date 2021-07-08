@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Input from './Input';
-import stylesConfig from './../../style/stylesConfig';
+import stylesConfig from '../../utils/stylesConfig';
 
 function Form() {
 	const [title, setTittle] = useState('');

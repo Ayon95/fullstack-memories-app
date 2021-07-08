@@ -1,5 +1,5 @@
 import config from './utils/config';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import postRoutes from './routes/posts';
@@ -24,11 +24,16 @@ app.use(express.json({ limit: '30mb' }));
 // enable body parser for url-encoded bodies
 app.use(express.urlencoded({ limit: '30mb', extended: true }));
 
-// enable CORS
+// enable CORS - this needs to be before you apply routes
 app.use(cors());
 
 // applying routes related to posts
 app.use('/posts', postRoutes);
+
+// applying middleware to handle requests to unknown endpoints
+app.use((request: Request, response: Response) => {
+	response.status(404).json({ errorMessage: 'The url does not exist' });
+});
 
 // listen for requests on the specified port
 app.listen(config.PORT, () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import stylesConfig from '../../style/stylesConfig';
+import stylesConfig from '../../utils/stylesConfig';
 
 function Navbar() {
 	return (
