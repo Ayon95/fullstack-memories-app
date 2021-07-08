@@ -18,10 +18,10 @@ const GlobalStyles = createGlobalStyle`
     body {
         font-size: 1.6rem;
         font-family: 'Roboto', sans-serif;
-        padding: 0 2rem;
+        padding: 2rem;
     }
 
-    .App {
+    main {
        display: flex;
     }
 
