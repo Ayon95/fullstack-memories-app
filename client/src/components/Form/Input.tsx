@@ -6,7 +6,7 @@ type Props = {
 	type?: 'text' | 'email';
 	name: string;
 	label: string;
-	value: string;
+	value: string | string[];
 	setValue: React.Dispatch<React.SetStateAction<any>>;
 };
 

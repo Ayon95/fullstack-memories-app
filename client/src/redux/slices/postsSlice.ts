@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { ErrorObj, Post, PostsSliceState } from '../../utils/types';
+import { BasePost, ErrorObj, Post, PostsSliceState } from '../../utils/types';
+import { isPendingAction, isRejectedAction } from './../matchers';
 
 const baseUrl = 'http://localhost:5000/posts';
 
@@ -28,6 +29,27 @@ export const fetchAllPosts = createAsyncThunk<Post[], void, { rejectValue: strin
 		// the request was successful
 		// using type assertion to tell TS that the response data will be an array of Post objects
 		const data = (await response.json()) as Post[];
+		console.log(data);
+		return data;
+	}
+);
+
+// thunk creator responsible for sending a POST request to add a new post
+export const createPost = createAsyncThunk<Post, BasePost, { rejectValue: string }>(
+	'posts/createPost',
+	async (post, thunkAPI) => {
+		const response = await fetch(baseUrl, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(post),
+		});
+
+		if (!response.ok) {
+			const error = (await response.json()) as ErrorObj;
+			return thunkAPI.rejectWithValue(error.errorMessage);
+		}
+
+		const data = (await response.json()) as Post;
 		return data;
 	}
 );
@@ -37,17 +59,22 @@ const postsSlice = createSlice({
 	initialState,
 	reducers: {},
 	extraReducers: builder => {
-		builder.addCase(fetchAllPosts.pending, state => {
-			state.status = 'pending';
-			state.error = '';
-		});
-
 		builder.addCase(fetchAllPosts.fulfilled, (state, action) => {
 			state.status = 'success';
 			state.postItems = action.payload;
 		});
 
-		builder.addCase(fetchAllPosts.rejected, (state, action) => {
+		builder.addCase(createPost.fulfilled, (state, action) => {
+			state.status = 'success';
+			state.postItems.push(action.payload);
+		});
+
+		builder.addMatcher(isPendingAction, state => {
+			state.status = 'pending';
+			state.error = '';
+		});
+
+		builder.addMatcher(isRejectedAction, (state, action) => {
 			state.status = 'failure';
 			// action.payload will not be undefined if the promise was handled by rejectWithValue
 			if (action.payload) state.error = action.payload;

@@ -3,14 +3,19 @@ import styled from 'styled-components';
 import Input from './Input';
 import stylesConfig from '../../utils/stylesConfig';
 import { convertToBase64 } from '../../utils/helpers';
+import { useDispatch } from 'react-redux';
+import { createPost } from '../../redux/slices/postsSlice';
+import { BasePost } from '../../utils/types';
 
 function Form() {
 	const [author, setAuthor] = useState('');
 	const [title, setTittle] = useState('');
 	const [description, setDescription] = useState('');
-	const [tags, setTags] = useState('');
+	const [tags, setTags] = useState<string[]>([]);
 	// the image file will be converted to a base-64 string
 	const [selectedFile, setSelectedFile] = useState('');
+
+	const dispatch = useDispatch();
 
 	// each time a user selects a file, the file will be converted to a base64-encoded string
 	async function handleChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -18,8 +23,25 @@ function Form() {
 		const base64String = await convertToBase64(e.target.files[0]);
 		setSelectedFile(base64String);
 	}
+
+	function resetForm() {
+		setAuthor('');
+		setTittle('');
+		setDescription('');
+		setTags([]);
+		setSelectedFile('');
+	}
+
+	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		const canSubmit = [author, title, description, tags, selectedFile].every(Boolean);
+		if (!canSubmit) return console.log('A required field is missing');
+		const post: BasePost = { author, title, description, tags, selectedFile };
+		dispatch(createPost(post));
+		resetForm();
+	}
 	return (
-		<FormComponent autoComplete="off">
+		<FormComponent autoComplete="off" onSubmit={handleSubmit}>
 			<FormTitle>Add Memory</FormTitle>
 			<FormControls>
 				<Input
