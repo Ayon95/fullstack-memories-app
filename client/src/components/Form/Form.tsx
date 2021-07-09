@@ -2,15 +2,35 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Input from './Input';
 import stylesConfig from '../../utils/stylesConfig';
+import { convertToBase64 } from '../../utils/helpers';
 
 function Form() {
+	const [author, setAuthor] = useState('');
 	const [title, setTittle] = useState('');
 	const [description, setDescription] = useState('');
 	const [tags, setTags] = useState('');
+	// the image file will be converted to a base-64 string
+	const [selectedFile, setSelectedFile] = useState('');
+
+	// each time a user selects a file, the file will be converted to a base64-encoded string
+	async function handleChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
+		if (!e.target.files) return;
+		const base64String = await convertToBase64(e.target.files[0]);
+		setSelectedFile(base64String);
+	}
 	return (
-		<FormComponent>
+		<FormComponent autoComplete="off">
 			<FormTitle>Add Memory</FormTitle>
 			<FormControls>
+				<Input
+					inputType="basic"
+					type="text"
+					name="author"
+					label="Author"
+					value={author}
+					setValue={setAuthor}
+				/>
+
 				<Input
 					inputType="basic"
 					type="text"
@@ -29,6 +49,14 @@ function Form() {
 				/>
 
 				<Input inputType="basic" name="tags" label="Tags" value={tags} setValue={setTags} />
+				<input
+					className="input--file"
+					type="file"
+					name="postImage"
+					id="postImage"
+					accept=".jpeg, .jpg, .png"
+					onChange={handleChangeFile}
+				/>
 			</FormControls>
 
 			<FormButtonContainer>

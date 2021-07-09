@@ -23,13 +23,11 @@ export const fetchAllPosts = createAsyncThunk<Post[], void, { rejectValue: strin
 		// the server will respond with an error object
 		if (!response.ok) {
 			const error = (await response.json()) as ErrorObj;
-			console.log(error);
 			return thunkAPI.rejectWithValue(error.errorMessage);
 		}
 		// the request was successful
 		// using type assertion to tell TS that the response data will be an array of Post objects
 		const data = (await response.json()) as Post[];
-		console.log(data);
 		return data;
 	}
 );

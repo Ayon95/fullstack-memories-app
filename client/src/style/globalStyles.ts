@@ -48,6 +48,10 @@ const GlobalStyles = createGlobalStyle`
         }
     }
 
+    .input--file {
+        margin-bottom: 2rem;
+    }
+
 
 `;
 

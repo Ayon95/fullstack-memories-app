@@ -1,11 +1,14 @@
-// shape of a post object
-export type Post = {
-	_id: string;
+// shape of base post object
+export type BasePost = {
 	title: string;
 	author: string;
 	description: string;
 	tags: string[];
 	selectedFile: string;
+};
+
+export type Post = BasePost & {
+	_id: string;
 	likes: number;
 	createdAt: Date;
 };

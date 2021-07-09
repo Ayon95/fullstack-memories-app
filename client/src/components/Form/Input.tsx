@@ -51,6 +51,7 @@ const inputStyles = css`
 	border: none;
 	background-color: #dfdfdf;
 	border-radius: 4px;
+	width: 100%;
 
 	&:focus {
 		box-shadow: 0 0 0 2px rgba(14, 2, 179, 0.3);
