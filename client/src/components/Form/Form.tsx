@@ -18,6 +18,7 @@ function Form() {
 	// the image file will be converted to a base-64 string
 	const [selectedFile, setSelectedFile] = useState('');
 
+	const status = useSelector((state: RootState) => state.posts.status);
 	const currentPostId = useSelector((state: RootState) => state.posts.currentPostId);
 	const currentPost = useSelector((state: RootState) =>
 		state.posts.postItems.find(post => post._id === currentPostId)
@@ -111,7 +112,7 @@ function Form() {
 			</FormControls>
 
 			<FormButtonContainer>
-				<FormButton className="btn btn--primary" type="submit">
+				<FormButton className="btn btn--primary" type="submit" disabled={status === 'pending'}>
 					Submit
 				</FormButton>
 				<FormButton className="btn btn--secondary" type="button">
@@ -125,6 +126,7 @@ function Form() {
 export default Form;
 
 const FormComponent = styled.form`
+	flex: 1;
 	padding: 2rem;
 	border-radius: 4px;
 	box-shadow: ${stylesConfig.shadowNormal};

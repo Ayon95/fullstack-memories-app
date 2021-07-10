@@ -13,7 +13,6 @@ function Navbar() {
 export default Navbar;
 
 const NavbarContainer = styled.header`
-	background-color: #eee;
 	box-shadow: ${stylesConfig.shadowNormal};
 	border-radius: 4px;
 	padding: 1rem 2rem;

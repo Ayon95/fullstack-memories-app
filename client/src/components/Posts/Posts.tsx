@@ -19,6 +19,9 @@ function Posts() {
 export default Posts;
 
 const PostsContainer = styled.section`
-	flex: 1;
+	flex: 3;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	column-gap: 2rem;
 	margin-right: 2rem;
 `;

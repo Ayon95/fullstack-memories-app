@@ -1,5 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
+import stylesConfig from '../../utils/stylesConfig';
 
 type Props = {
 	inputType: 'basic' | 'textarea';
@@ -49,7 +50,7 @@ const inputStyles = css`
 	padding: 1rem;
 	outline: none;
 	border: none;
-	background-color: #dfdfdf;
+	background-color: ${stylesConfig.colorGrey1};
 	border-radius: 4px;
 	width: 100%;
 

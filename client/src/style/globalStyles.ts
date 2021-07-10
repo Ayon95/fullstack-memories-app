@@ -25,6 +25,12 @@ const GlobalStyles = createGlobalStyle`
        display: flex;
     }
 
+    .App {
+        width: 100%;
+        max-width: 150rem;
+        margin: 0 auto;
+    }
+
     .btn {
         text-transform: uppercase;
         border-radius: 4px;
@@ -34,18 +40,34 @@ const GlobalStyles = createGlobalStyle`
         border: none;
         padding: 1.2rem 1.5rem;
         cursor: pointer;
+        transition: background-color 0.2s;
 
         &:not(:last-child) {
             margin-bottom: 1rem;
         }
 
+        
         &--primary {
             background-color: ${stylesConfig.colorPrimary};
+            
+            &:hover {
+                background-color: ${stylesConfig.colorPrimaryLight1};
+            }
+
+            &:disabled {
+                cursor: not-allowed;
+                background-color: ${stylesConfig.colorGrey2};
+            }
         }
 
         &--secondary {
             background-color: ${stylesConfig.colorSecondary};
+
+            &:hover {
+                background-color: ${stylesConfig.colorSecondaryLight1};
+            }
         }
+
     }
 
     .input--file {
