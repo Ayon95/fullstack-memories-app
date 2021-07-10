@@ -2,6 +2,7 @@
 
 import { Request, Response } from 'express';
 import Post from '../models/Post';
+import { BasePost } from '../utils/types';
 
 export async function getPosts(request: Request, response: Response) {
 	try {
@@ -15,12 +16,45 @@ export async function getPosts(request: Request, response: Response) {
 
 export async function createPost(request: Request, response: Response) {
 	try {
+		const post: BasePost = request.body;
+		// checking if a required field is missing or not
+		if (![post.title, post.author, post.description].every(Boolean)) {
+			return response
+				.status(400)
+				.json({ errorMessage: 'Either title, author, or description is missing' });
+		}
 		// creating a new post document
 		const newPost = new Post(request.body);
+
 		// saving the new post doc to the posts collection
 		await newPost.save();
 		response.status(201).json(newPost);
 	} catch (error) {
 		response.status(409).json({ errorMessage: error.message });
+	}
+}
+
+export async function updatePost(request: Request, response: Response) {
+	const id = request.params.id;
+	const post: BasePost = request.body;
+	try {
+		// checking if any post exists with the given id
+		const postExists = await Post.exists({ _id: id });
+		if (!postExists) {
+			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+		}
+
+		// checking if a required field is missing
+		if ([!post.title, post.author, post.description].every(Boolean)) {
+			return response
+				.status(400)
+				.json({ errorMessage: 'Either title, author, or description is missing' });
+		}
+		// updating the post doc
+		// if new is true, the updated document will be returned
+		const updatedPost = await Post.findByIdAndUpdate(id, post, { new: true });
+		return response.json(updatedPost);
+	} catch (error) {
+		return response.status(409).json({ errorMessage: error.message });
 	}
 }
