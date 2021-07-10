@@ -5,7 +5,7 @@ import { IconButtonProps, Post } from '../../utils/types';
 import { FaThumbsUp, FaTrashAlt, FaEdit } from 'react-icons/fa';
 import stylesConfig from '../../utils/stylesConfig';
 import { useDispatch } from 'react-redux';
-import { postsActionCreators } from '../../redux/slices/postsSlice';
+import { deletePost, postsActionCreators } from '../../redux/slices/postsSlice';
 
 type Props = { post: Post };
 
@@ -14,6 +14,10 @@ function PostItem({ post }: Props) {
 
 	function handleClickEdit(id: string) {
 		dispatch(postsActionCreators.setCurrentPostId(id));
+	}
+
+	function handleClickDelete(id: string) {
+		dispatch(deletePost(id));
 	}
 	return (
 		<PostWrapper>
@@ -38,7 +42,7 @@ function PostItem({ post }: Props) {
 					Edit
 				</IconButton>
 
-				<IconButton color={stylesConfig.colorSecondary}>
+				<IconButton color={stylesConfig.colorSecondary} onClick={() => handleClickDelete(post._id)}>
 					<FaTrashAlt />
 					Delete
 				</IconButton>
@@ -69,7 +73,7 @@ const PostImage = styled.img`
 const PostContent = styled.div`
 	padding: 0 2rem;
 	margin-top: 2rem;
-	/* this works like horizontal auto margin because its a flex item */
+	/* works like horizontal auto margin because it's a flex item */
 	margin-bottom: auto;
 `;
 
@@ -98,6 +102,7 @@ const PostActions = styled.div`
 	display: flex;
 	justify-content: space-between;
 	padding: 0 2rem 2rem 2rem;
+	margin-top: 2rem;
 `;
 
 const IconButton = styled.button<IconButtonProps>`

@@ -127,6 +127,7 @@ export default Form;
 
 const FormComponent = styled.form`
 	flex: 1;
+	align-self: flex-start;
 	padding: 2rem;
 	border-radius: 4px;
 	box-shadow: ${stylesConfig.shadowNormal};

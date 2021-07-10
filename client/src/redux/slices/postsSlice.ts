@@ -76,6 +76,22 @@ export const updatePost = createAsyncThunk<
 	return data;
 });
 
+// thunk creator responsible for sending a DELETE request to delete a specific post
+export const deletePost = createAsyncThunk<string, string, { rejectValue: string }>(
+	'posts/deletePost',
+	async (id, thunkAPI) => {
+		const response = await fetch(`${baseUrl}/${id}`, { method: 'DELETE' });
+
+		if (!response.ok) {
+			const error = (await response.json()) as ErrorObj;
+			return thunkAPI.rejectWithValue(error.errorMessage);
+		}
+
+		// return the id of the deleted post as payload because we will need it to remove that post from the postItems array
+		return id;
+	}
+);
+
 const postsSlice = createSlice({
 	name: 'posts',
 	initialState,
@@ -106,6 +122,12 @@ const postsSlice = createSlice({
 				post._id === action.payload._id ? action.payload : post
 			);
 
+			state.postItems = updatedPostsList;
+		});
+
+		builder.addCase(deletePost.fulfilled, (state, action) => {
+			state.status = 'success';
+			const updatedPostsList = state.postItems.filter(post => post._id !== action.payload);
 			state.postItems = updatedPostsList;
 		});
 
