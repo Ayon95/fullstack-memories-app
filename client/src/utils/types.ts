@@ -21,6 +21,7 @@ export type PostsSliceState = {
 	postItems: Post[];
 	status: 'idle' | 'pending' | 'success' | 'failure';
 	error: string;
+	currentPostId: string;
 };
 
 // shape of error object sent as response by the server

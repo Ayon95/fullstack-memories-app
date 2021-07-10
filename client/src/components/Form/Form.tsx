@@ -3,9 +3,12 @@ import styled from 'styled-components';
 import Input from './Input';
 import stylesConfig from '../../utils/stylesConfig';
 import { convertToBase64 } from '../../utils/helpers';
-import { useDispatch } from 'react-redux';
-import { createPost } from '../../redux/slices/postsSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { createPost, postsActionCreators } from '../../redux/slices/postsSlice';
 import { BasePost } from '../../utils/types';
+import { RootState } from '../../redux/store';
+import { updatePost } from './../../redux/slices/postsSlice';
+import { useEffect } from 'react';
 
 function Form() {
 	const [author, setAuthor] = useState('');
@@ -15,7 +18,27 @@ function Form() {
 	// the image file will be converted to a base-64 string
 	const [selectedFile, setSelectedFile] = useState('');
 
+	const currentPostId = useSelector((state: RootState) => state.posts.currentPostId);
+	const currentPost = useSelector((state: RootState) =>
+		state.posts.postItems.find(post => post._id === currentPostId)
+	);
+
 	const dispatch = useDispatch();
+
+	// populate form fields with the data of currently-selected post if there is a current post id
+	useEffect(() => {
+		function populateFormFields() {
+			// I know for sure that when this function will be called, current post will exist
+			setAuthor(currentPost!.author);
+			setTittle(currentPost!.title);
+			setDescription(currentPost!.description);
+			setTags(currentPost!.tags);
+			setSelectedFile(currentPost!.selectedFile);
+		}
+		if (currentPost) {
+			populateFormFields();
+		}
+	}, [dispatch, currentPost]);
 
 	// each time a user selects a file, the file will be converted to a base64-encoded string
 	async function handleChangeFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -36,12 +59,19 @@ function Form() {
 		const canSubmit = [author, title, description, tags, selectedFile].every(Boolean);
 		if (!canSubmit) return console.log('A required field is missing');
 		const post: BasePost = { author, title, description, tags, selectedFile };
-		dispatch(createPost(post));
+		// need to update post if there is a current post id
+		if (currentPostId) {
+			dispatch(updatePost({ id: currentPostId, postData: post }));
+			// clear current post id
+			dispatch(postsActionCreators.clearCurrentPostId());
+		}
+		// else create new post
+		else dispatch(createPost(post));
 		resetForm();
 	}
 	return (
 		<FormComponent autoComplete="off" onSubmit={handleSubmit}>
-			<FormTitle>Add Memory</FormTitle>
+			<FormTitle>{currentPostId ? 'Edit' : 'Add'} A Memory</FormTitle>
 			<FormControls>
 				<Input
 					inputType="basic"

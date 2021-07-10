@@ -4,10 +4,17 @@ import styled from 'styled-components';
 import { IconButtonProps, Post } from '../../utils/types';
 import { FaThumbsUp, FaTrashAlt, FaEdit } from 'react-icons/fa';
 import stylesConfig from '../../utils/stylesConfig';
+import { useDispatch } from 'react-redux';
+import { postsActionCreators } from '../../redux/slices/postsSlice';
 
 type Props = { post: Post };
 
 function PostItem({ post }: Props) {
+	const dispatch = useDispatch();
+
+	function handleClickEdit(id: string) {
+		dispatch(postsActionCreators.setCurrentPostId(id));
+	}
 	return (
 		<PostWrapper>
 			<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
@@ -26,7 +33,7 @@ function PostItem({ post }: Props) {
 					Like
 				</IconButton>
 
-				<IconButton color="#575b5f">
+				<IconButton color="#575b5f" onClick={() => handleClickEdit(post._id)}>
 					<FaEdit />
 					Edit
 				</IconButton>
