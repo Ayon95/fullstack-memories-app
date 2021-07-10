@@ -3,14 +3,15 @@ import { useSelector } from 'react-redux';
 import Post from './PostItem';
 import { RootState } from '../../redux/store';
 import styled from 'styled-components';
+import LoadingSpinner from '../generic/LoadingSpinner';
 
 function Posts() {
 	const posts = useSelector((state: RootState) => state.posts.postItems);
+	const postsStatus = useSelector((state: RootState) => state.posts.status);
 	return (
 		<PostsContainer>
-			{posts.map(post => (
-				<Post key={post._id} post={post} />
-			))}
+			{postsStatus === 'pending' && <LoadingSpinner />}
+			{posts && posts.map(post => <Post key={post._id} post={post} />)}
 		</PostsContainer>
 	);
 }
@@ -18,5 +19,6 @@ function Posts() {
 export default Posts;
 
 const PostsContainer = styled.section`
+	flex: 1;
 	margin-right: 2rem;
 `;

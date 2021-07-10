@@ -7,6 +7,7 @@ export type BasePost = {
 	selectedFile: string;
 };
 
+// the final post object after being saved to the database
 export type Post = BasePost & {
 	_id: string;
 	likes: number;
@@ -24,3 +25,6 @@ export type PostsSliceState = {
 
 // shape of error object sent as response by the server
 export type ErrorObj = { errorMessage: string };
+
+// shape of props object for IconButton
+export type IconButtonProps = { readonly color: string };

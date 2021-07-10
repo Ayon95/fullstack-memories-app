@@ -1,7 +1,7 @@
 import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
 import styled from 'styled-components';
-import { Post } from '../../utils/types';
+import { IconButtonProps, Post } from '../../utils/types';
 import { FaThumbsUp, FaTrashAlt, FaEdit } from 'react-icons/fa';
 import stylesConfig from '../../utils/stylesConfig';
 
@@ -90,7 +90,7 @@ const PostActions = styled.div`
 	padding: 0 2rem 2rem 2rem;
 `;
 
-const IconButton = styled.button`
+const IconButton = styled.button<IconButtonProps>`
 	font-size: 1.6rem;
 	color: ${props => props.color};
 	font-family: 'Roboto';

@@ -52,6 +52,18 @@ const GlobalStyles = createGlobalStyle`
         margin-bottom: 2rem;
     }
 
+    /* Animations */
+
+    @keyframes rotateSpinner {
+        0% {
+            transform: rotate(0);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
 
 `;
 
