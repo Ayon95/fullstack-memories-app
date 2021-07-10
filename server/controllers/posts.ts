@@ -58,3 +58,18 @@ export async function updatePost(request: Request, response: Response) {
 		return response.status(409).json({ errorMessage: error.message });
 	}
 }
+
+export async function deletePost(request: Request, response: Response) {
+	const { id } = request.params;
+
+	// checking if any post with the id exists
+	const postExists = await Post.exists({ _id: id });
+
+	if (!postExists) {
+		return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+	}
+
+	// deleting the post doc from the database
+	await Post.findByIdAndDelete(id);
+	response.status(204).end();
+}
