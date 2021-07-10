@@ -29,7 +29,6 @@ export const fetchAllPosts = createAsyncThunk<Post[], void, { rejectValue: strin
 		// the request was successful
 		// using type assertion to tell TS that the response data will be an array of Post objects
 		const data = (await response.json()) as Post[];
-		console.log(data);
 		return data;
 	}
 );
@@ -50,6 +49,8 @@ export const createPost = createAsyncThunk<Post, BasePost, { rejectValue: string
 		}
 
 		const data = (await response.json()) as Post;
+		console.log(data);
+		console.log(typeof data.createdAt);
 		return data;
 	}
 );

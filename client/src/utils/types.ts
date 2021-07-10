@@ -10,7 +10,9 @@ export type BasePost = {
 export type Post = BasePost & {
 	_id: string;
 	likes: number;
-	createdAt: Date;
+	// a Date object gets parsed to a string after parsing the JSON data sent by the server
+	// parse it back to a date object yourself wherever you are using it, e.g. in the PostItem component
+	createdAt: string;
 };
 
 // shape of posts state

@@ -29,7 +29,6 @@ function Form() {
 		setTittle('');
 		setDescription('');
 		setTags([]);
-		setSelectedFile('');
 	}
 
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -96,10 +95,9 @@ function Form() {
 export default Form;
 
 const FormComponent = styled.form`
-	padding: 1.5rem;
+	padding: 2rem;
 	border-radius: 4px;
 	box-shadow: ${stylesConfig.shadowNormal};
-	background-color: #eee;
 `;
 
 const FormTitle = styled.h3`
