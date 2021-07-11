@@ -13,7 +13,7 @@ export type Post = BasePost & {
 	likes: number;
 	// a Date object gets parsed to a string after parsing the JSON data sent by the server
 	// parse it back to a date object yourself wherever you are using it, e.g. in the PostItem component
-	createdAt: string;
+	createdAt: Date;
 };
 
 // shape of posts state

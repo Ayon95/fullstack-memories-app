@@ -6,6 +6,7 @@ type GenericAsyncThunk = AsyncThunk<unknown, unknown, { rejectValue: string }>;
 // return types for the pending and rejected action creators, i.e. types for the pending and rejected actions
 type PendingAction = ReturnType<GenericAsyncThunk['pending']>;
 type RejectedAction = ReturnType<GenericAsyncThunk['rejected']>;
+type FulfilledAction = ReturnType<GenericAsyncThunk['fulfilled']>;
 
 // matcher function that matches all actions whose action type ends with '/pending'
 // using a type predicate here to narrow down the type of action parameter

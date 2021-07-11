@@ -24,7 +24,7 @@ export async function createPost(request: Request, response: Response) {
 				.json({ errorMessage: 'Either title, author, or description is missing' });
 		}
 		// creating a new post document
-		const newPost = new Post(request.body);
+		const newPost = new Post({...request.body, createdAt: new Date()});
 
 		// saving the new post doc to the posts collection
 		await newPost.save();

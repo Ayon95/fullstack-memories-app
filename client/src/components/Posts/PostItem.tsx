@@ -2,14 +2,16 @@ import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
 import styled from 'styled-components';
 import { IconButtonProps, Post } from '../../utils/types';
-import { FaThumbsUp, FaTrashAlt, FaEdit } from 'react-icons/fa';
+import { FaThumbsUp, FaTrashAlt, FaEdit, FaThumbsDown } from 'react-icons/fa';
 import stylesConfig from '../../utils/stylesConfig';
 import { useDispatch } from 'react-redux';
-import { deletePost, postsActionCreators } from '../../redux/slices/postsSlice';
+import { deletePost, postsActionCreators, updateLikes } from '../../redux/slices/postsSlice';
+import { useState } from 'react';
 
 type Props = { post: Post };
 
 function PostItem({ post }: Props) {
+	const [isLiked, setIsLiked] = useState(false);
 	const dispatch = useDispatch();
 
 	function handleClickEdit(id: string) {
@@ -19,6 +21,15 @@ function PostItem({ post }: Props) {
 	function handleClickDelete(id: string) {
 		dispatch(deletePost(id));
 	}
+
+	function handleClickLike(id: string) {
+		// if the post is already liked, then unlike the post
+		// if the post is not liked, then like the post
+		if (isLiked) dispatch(updateLikes({ id, likes: post.likes - 1 }));
+		if (!isLiked) dispatch(updateLikes({ id, likes: post.likes + 1 }));
+
+		setIsLiked(currentState => !currentState);
+	}
 	return (
 		<PostWrapper>
 			<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
@@ -27,14 +38,25 @@ function PostItem({ post }: Props) {
 					<PostTags>{post.tags}</PostTags>
 					<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
 					<PostTitle>{post.title}</PostTitle>
-					<PostLikes>{post.likes} likes</PostLikes>
+					<PostLikes>
+						{post.likes} {post.likes === 1 ? 'like' : 'likes'}
+					</PostLikes>
 				</PostInfo>
 				<PostDescription>{post.description}</PostDescription>
 			</PostContent>
 			<PostActions>
-				<IconButton color={stylesConfig.colorPrimary}>
-					<FaThumbsUp />
-					Like
+				<IconButton color={stylesConfig.colorPrimary} onClick={() => handleClickLike(post._id)}>
+					{isLiked ? (
+						<>
+							<FaThumbsDown />
+							Unlike
+						</>
+					) : (
+						<>
+							<FaThumbsUp />
+							Like
+						</>
+					)}
 				</IconButton>
 
 				<IconButton color={stylesConfig.colorGrey3} onClick={() => handleClickEdit(post._id)}>

@@ -76,6 +76,27 @@ export const updatePost = createAsyncThunk<
 	return data;
 });
 
+// thunk creator responsible for sending a PUT request to update the like count of a specific post
+export const updateLikes = createAsyncThunk<
+	Post,
+	{ id: string; likes: number },
+	{ rejectValue: string }
+>('posts/updateLikes', async (post, thunkAPI) => {
+	const response = await fetch(`${baseUrl}/likes/${post.id}`, {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(post),
+	});
+
+	if (!response.ok) {
+		const error = (await response.json()) as ErrorObj;
+		return thunkAPI.rejectWithValue(error.errorMessage);
+	}
+
+	const data = (await response.json()) as Post;
+	return data;
+});
+
 // thunk creator responsible for sending a DELETE request to delete a specific post
 export const deletePost = createAsyncThunk<string, string, { rejectValue: string }>(
 	'posts/deletePost',
@@ -103,6 +124,32 @@ const postsSlice = createSlice({
 		clearCurrentPostId: state => {
 			state.currentPostId = '';
 		},
+
+		// likePost: (state, action: PayloadAction<string>) => {
+		// 	const updatedPostsList = state.postItems.map(post => {
+		// 		if (post._id === action.payload) {
+		// 			post.likes++;
+		// 			return post;
+		// 		}
+
+		// 		return post;
+		// 	});
+
+		// 	state.postItems = updatedPostsList;
+		// },
+
+		// unlikePost: (state, action: PayloadAction<string>) => {
+		// 	const updatedPostsList = state.postItems.map(post => {
+		// 		if (post._id === action.payload) {
+		// 			post.likes--;
+		// 			return post;
+		// 		}
+
+		// 		return post;
+		// 	});
+
+		// 	state.postItems = updatedPostsList;
+		// },
 	},
 	extraReducers: builder => {
 		builder.addCase(fetchAllPosts.fulfilled, (state, action) => {
@@ -116,6 +163,16 @@ const postsSlice = createSlice({
 		});
 
 		builder.addCase(updatePost.fulfilled, (state, action) => {
+			state.status = 'success';
+			// generating a new array where the old post is replaced with the updated post
+			const updatedPostsList = state.postItems.map(post =>
+				post._id === action.payload._id ? action.payload : post
+			);
+
+			state.postItems = updatedPostsList;
+		});
+
+		builder.addCase(updateLikes.fulfilled, (state, action) => {
 			state.status = 'success';
 			// generating a new array where the old post is replaced with the updated post
 			const updatedPostsList = state.postItems.map(post =>

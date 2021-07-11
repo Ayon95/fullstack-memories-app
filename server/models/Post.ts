@@ -9,7 +9,7 @@ const postSchema = new mongoose.Schema<PostDoc>({
 	tags: [String],
 	selectedFile: String,
 	likes: { type: Number, default: 0 },
-	createdAt: { type: Date, default: new Date() },
+	createdAt: { type: Date },
 });
 
 // create a Post model based on the post schema

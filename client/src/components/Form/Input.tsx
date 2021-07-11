@@ -27,7 +27,10 @@ function Input(props: Props) {
 				<TextArea
 					id={props.name}
 					value={props.value}
+					maxLength={250}
 					onChange={e => props.setValue(e.target.value)}
+					rows={6}
+					placeholder="Maximum 250 characters"
 				/>
 			)}
 		</FormControl>
