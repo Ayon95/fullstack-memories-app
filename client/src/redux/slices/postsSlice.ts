@@ -82,7 +82,7 @@ export const updateLikes = createAsyncThunk<
 	{ id: string; likes: number },
 	{ rejectValue: string }
 >('posts/updateLikes', async (post, thunkAPI) => {
-	const response = await fetch(`${baseUrl}/likes/${post.id}`, {
+	const response = await fetch(`${baseUrl}/${post.id}/likes`, {
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify(post),

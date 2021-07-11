@@ -24,7 +24,7 @@ export async function createPost(request: Request, response: Response) {
 				.json({ errorMessage: 'Either title, author, or description is missing' });
 		}
 		// creating a new post document
-		const newPost = new Post({...request.body, createdAt: new Date()});
+		const newPost = new Post({ ...request.body, createdAt: new Date() });
 
 		// saving the new post doc to the posts collection
 		await newPost.save();
@@ -57,6 +57,21 @@ export async function updatePost(request: Request, response: Response) {
 	} catch (error) {
 		return response.status(409).json({ errorMessage: error.message });
 	}
+}
+
+export async function updateLikes(request: Request, response: Response) {
+	const id = request.params.id;
+
+	const postExists = await Post.exists({ _id: id });
+	if (!postExists) {
+		return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+	}
+
+	const postData: { id: string; likes: number } = request.body;
+
+	// updating only the likes property of the post
+	const updatedPost = await Post.findByIdAndUpdate(id, { likes: postData.likes }, { new: true });
+	return response.json(updatedPost);
 }
 
 export async function deletePost(request: Request, response: Response) {
