@@ -1,4 +1,5 @@
 import { AnyAction, AsyncThunk } from '@reduxjs/toolkit';
+import { BasePost } from '../utils/types';
 
 // type for the return value of createAsyncThunk
 type GenericAsyncThunk = AsyncThunk<unknown, unknown, { rejectValue: string }>;
@@ -18,4 +19,9 @@ export function isPendingAction(action: AnyAction): action is PendingAction {
 // matcher function that matches all actions except for those with 'Likes' whose action type ends with '/rejected'
 export function isRejectedAction(action: AnyAction): action is RejectedAction {
 	return action.type.endsWith('/rejected');
+}
+
+// matcher function that matches all actions whose type contains 'update' and ends with '/fulfilled'
+export function updateIsFulfilledAction(action: AnyAction): action is FulfilledAction {
+	return action.type.includes('update') && action.type.endsWith('/fulfilled');
 }

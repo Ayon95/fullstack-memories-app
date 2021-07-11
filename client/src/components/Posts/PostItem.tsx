@@ -5,8 +5,9 @@ import { IconButtonProps, Post } from '../../utils/types';
 import { FaThumbsUp, FaTrashAlt, FaEdit, FaThumbsDown } from 'react-icons/fa';
 import stylesConfig from '../../utils/stylesConfig';
 import { useDispatch } from 'react-redux';
-import { deletePost, postsActionCreators, updateLikes } from '../../redux/slices/postsSlice';
+import { postsActions } from '../../redux/slices/posts/postsSlice';
 import { useState } from 'react';
+import { deletePost, updateLikes } from './../../redux/slices/posts/postsThunks';
 
 type Props = { post: Post };
 
@@ -15,7 +16,7 @@ function PostItem({ post }: Props) {
 	const dispatch = useDispatch();
 
 	function handleClickEdit(id: string) {
-		dispatch(postsActionCreators.setCurrentPostId(id));
+		dispatch(postsActions.setCurrentPostId(id));
 	}
 
 	function handleClickDelete(id: string) {

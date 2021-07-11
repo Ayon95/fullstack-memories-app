@@ -4,10 +4,10 @@ import Input from './Input';
 import stylesConfig from '../../utils/stylesConfig';
 import { convertToBase64 } from '../../utils/helpers';
 import { useDispatch, useSelector } from 'react-redux';
-import { createPost, postsActionCreators } from '../../redux/slices/postsSlice';
+import { postsActions } from '../../redux/slices/posts/postsSlice';
 import { BasePost } from '../../utils/types';
 import { RootState } from '../../redux/store';
-import { updatePost } from './../../redux/slices/postsSlice';
+import { createPost, updatePost } from '../../redux/slices/posts/postsThunks';
 import { useEffect } from 'react';
 
 function Form() {
@@ -64,7 +64,7 @@ function Form() {
 		if (currentPostId) {
 			dispatch(updatePost({ id: currentPostId, postData: post }));
 			// clear current post id
-			dispatch(postsActionCreators.clearCurrentPostId());
+			dispatch(postsActions.clearCurrentPostId());
 		}
 		// else create new post
 		else dispatch(createPost(post));

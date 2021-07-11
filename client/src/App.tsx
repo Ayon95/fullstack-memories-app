@@ -5,8 +5,7 @@ import Posts from './components/Posts/Posts';
 import Navbar from './components/Navbar/Navbar';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchAllPosts } from './redux/slices/postsSlice';
-import LoadingSpinner from './components/generic/LoadingSpinner';
+import { fetchAllPosts } from './redux/slices/posts/postsThunks';
 
 function App() {
 	const dispatch = useDispatch();
