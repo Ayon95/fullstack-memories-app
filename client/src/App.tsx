@@ -1,26 +1,28 @@
 import React from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import GlobalStyles from './style/globalStyles';
-import Form from './components/Form/Form';
-import Posts from './components/Posts/Posts';
 import Navbar from './components/Navbar/Navbar';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { fetchAllPosts } from './redux/slices/posts/postsThunks';
+import Home from './pages/Home';
+import Welcome from './pages/Welcome';
 
 function App() {
-	const dispatch = useDispatch();
-	useEffect(() => {
-		dispatch(fetchAllPosts());
-	}, [dispatch]);
 	return (
 		<>
 			<GlobalStyles />
 			<div className="App">
 				<Navbar />
-				<main>
-					<Posts />
-					<Form />
-				</main>
+
+				<Router>
+					<Switch>
+						<Route path="/home">
+							<Home />
+						</Route>
+
+						<Route exact path="/">
+							<Welcome />
+						</Route>
+					</Switch>
+				</Router>
 			</div>
 		</>
 	);
