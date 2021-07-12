@@ -21,10 +21,6 @@ const GlobalStyles = createGlobalStyle`
         padding: 2rem;
     }
 
-    main {
-       display: flex;
-    }
-
     .App {
         width: 100%;
         max-width: 150rem;
