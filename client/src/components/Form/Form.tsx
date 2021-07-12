@@ -9,6 +9,7 @@ import { BasePost } from '../../utils/types';
 import { RootState } from '../../redux/store';
 import { createPost, updatePost } from '../../redux/slices/posts/postsThunks';
 import { useEffect } from 'react';
+import Button from '../generic/Button';
 
 function Form() {
 	const [author, setAuthor] = useState('');
@@ -112,12 +113,8 @@ function Form() {
 			</FormControls>
 
 			<FormButtonContainer>
-				<FormButton className="btn btn--primary" type="submit" disabled={status === 'pending'}>
-					Submit
-				</FormButton>
-				<FormButton className="btn btn--secondary" type="button">
-					Clear
-				</FormButton>
+				<Button text="Submit" color="primary" type="submit" isDisabled={status === 'pending'} />
+				<Button text="Clear" color="secondary" />
 			</FormButtonContainer>
 		</FormComponent>
 	);
@@ -141,7 +138,15 @@ const FormTitle = styled.h3`
 
 const FormControls = styled.div``;
 
-const FormButtonContainer = styled.div``;
+const FormButtonContainer = styled.div`
+	button {
+		width: 100%;
+	}
+
+	button:not(:last-child) {
+		margin-bottom: 1rem;
+	}
+`;
 
 const FormButton = styled.button`
 	width: 100%;
