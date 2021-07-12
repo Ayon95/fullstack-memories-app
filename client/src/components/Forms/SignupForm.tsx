@@ -1,10 +1,16 @@
 import React from 'react';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 import Button from '../generic/Button';
 import FormWrapper from './FormWrapper';
 import Input from './Input';
 
-function SignupForm() {
+type Props = {
+	closeModal: React.MouseEventHandler;
+};
+
+function SignupForm({ closeModal }: Props) {
 	const [firstName, setFirstName] = useState('');
 	const [lastName, setLastName] = useState('');
 	const [email, setEmail] = useState('');
@@ -16,7 +22,7 @@ function SignupForm() {
 	}
 
 	return (
-		<FormWrapper title="Log In" handleSubmit={handleSubmit}>
+		<FormWrapper title="Sign Up" handleSubmit={handleSubmit} style={{ backgroundColor: '#eee' }}>
 			<Input
 				inputType="basic"
 				type="text"
@@ -66,8 +72,15 @@ function SignupForm() {
 				text="Sign Up"
 				color="primary"
 				type="submit"
-				isDisabled={status === 'pending'}
+				style={{ width: '100%', marginBottom: '1rem' }}
+			/>
+
+			<Button
+				text="Close"
+				color="secondary"
+				type="button"
 				style={{ width: '100%' }}
+				handleClick={closeModal}
 			/>
 		</FormWrapper>
 	);

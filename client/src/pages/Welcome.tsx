@@ -1,21 +1,38 @@
 import React from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import LoginForm from '../components/Forms/LoginForm';
+import SignupForm from '../components/Forms/SignupForm';
 import Button from '../components/generic/Button';
+import Modal from '../components/Modal/Modal';
 import stylesConfig from '../utils/stylesConfig';
 
 function Welcome() {
+	const [shouldShowModal, setShouldShowModal] = useState(false);
+
+	function openModal() {
+		setShouldShowModal(true);
+	}
+
+	function closeModal() {
+		setShouldShowModal(false);
+	}
 	return (
-		<PageContainer>
-			<WelcomeContent>
-				<BrandIntro>
-					<h1>Memories</h1>
-					<p>Share your unforgettable moments with the people you love</p>
-					<Button text="Create Account" color="primary" isLink={true} />
-				</BrandIntro>
-				<LoginForm />
-			</WelcomeContent>
-		</PageContainer>
+		<>
+			<PageContainer>
+				<WelcomeContent>
+					<BrandIntro>
+						<h1>Memories</h1>
+						<p>Share your unforgettable moments with the people you love</p>
+						<Button text="Create Account" color="primary" handleClick={openModal} />
+					</BrandIntro>
+					<LoginForm />
+				</WelcomeContent>
+			</PageContainer>
+			{shouldShowModal && (
+				<Modal content={<SignupForm closeModal={closeModal} />} closeModal={closeModal} />
+			)}
+		</>
 	);
 }
 

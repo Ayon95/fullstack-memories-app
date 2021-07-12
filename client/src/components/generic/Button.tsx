@@ -10,6 +10,7 @@ type Props = {
 	isDisabled?: boolean;
 	style?: React.CSSProperties;
 	isLink?: boolean;
+	handleClick?: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 function Button(props: Props) {
@@ -27,6 +28,7 @@ function Button(props: Props) {
 			color={props.color}
 			disabled={props.isDisabled || false}
 			style={props.style}
+			onClick={props.handleClick}
 		>
 			{props.text}
 		</ButtonComponent>

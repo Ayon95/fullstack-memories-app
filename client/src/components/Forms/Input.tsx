@@ -50,12 +50,12 @@ const Label = styled.label`
 
 // generic input styles
 const inputStyles = css`
+	width: 100%;
 	padding: 1rem;
 	outline: none;
 	border: none;
 	background-color: ${stylesConfig.colorGrey1};
 	border-radius: 4px;
-	width: 100%;
 
 	&:focus {
 		box-shadow: ${stylesConfig.inputFocusStyle};
