@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Posts from '../components/Posts/Posts';
-import Form from '../components/Form/Form';
+import Form from '../components/Forms/PostForm';
 import { useDispatch } from 'react-redux';
 import { fetchAllPosts } from '../redux/slices/posts/postsThunks';
 

@@ -10,6 +10,7 @@ import { RootState } from '../../redux/store';
 import { createPost, updatePost } from '../../redux/slices/posts/postsThunks';
 import { useEffect } from 'react';
 import Button from '../generic/Button';
+import FormWrapper from './FormWrapper';
 
 function Form() {
 	const [author, setAuthor] = useState('');
@@ -72,51 +73,51 @@ function Form() {
 		resetForm();
 	}
 	return (
-		<FormComponent autoComplete="off" onSubmit={handleSubmit}>
-			<FormTitle>{currentPostId ? 'Edit' : 'Add'} A Memory</FormTitle>
-			<FormControls>
-				<Input
-					inputType="basic"
-					type="text"
-					name="author"
-					label="Author"
-					value={author}
-					setValue={setAuthor}
-				/>
+		<FormWrapper title={currentPostId ? 'Edit' : 'Add' + ' A Memory'} handleSubmit={handleSubmit}>
+			<Input
+				inputType="basic"
+				type="text"
+				name="author"
+				label="Author"
+				value={author}
+				setValue={setAuthor}
+			/>
 
-				<Input
-					inputType="basic"
-					type="text"
-					name="title"
-					label="Title"
-					value={title}
-					setValue={setTittle}
-				/>
+			<Input
+				inputType="basic"
+				type="text"
+				name="title"
+				label="Title"
+				value={title}
+				setValue={setTittle}
+			/>
 
-				<Input
-					inputType="textarea"
-					name="description"
-					label="Description"
-					value={description}
-					setValue={setDescription}
-				/>
+			<Input
+				inputType="textarea"
+				name="description"
+				label="Description"
+				value={description}
+				setValue={setDescription}
+			/>
 
-				<Input inputType="basic" name="tags" label="Tags" value={tags} setValue={setTags} />
-				<input
-					className="input--file"
-					type="file"
-					name="postImage"
-					id="postImage"
-					accept=".jpeg, .jpg, .png"
-					onChange={handleChangeFile}
-				/>
-			</FormControls>
+			<Input inputType="basic" name="tags" label="Tags" value={tags} setValue={setTags} />
+			<input
+				className="input--file"
+				type="file"
+				name="postImage"
+				id="postImage"
+				accept=".jpeg, .jpg, .png"
+				onChange={handleChangeFile}
+			/>
 
-			<FormButtonContainer>
-				<Button text="Submit" color="primary" type="submit" isDisabled={status === 'pending'} />
-				<Button text="Clear" color="secondary" />
-			</FormButtonContainer>
-		</FormComponent>
+			<Button
+				text="Submit"
+				color="primary"
+				type="submit"
+				isDisabled={status === 'pending'}
+				style={{ width: '100%' }}
+			/>
+		</FormWrapper>
 	);
 }
 
@@ -134,20 +135,4 @@ const FormTitle = styled.h3`
 	text-align: center;
 	font-size: 2.2rem;
 	margin-bottom: 1rem;
-`;
-
-const FormControls = styled.div``;
-
-const FormButtonContainer = styled.div`
-	button {
-		width: 100%;
-	}
-
-	button:not(:last-child) {
-		margin-bottom: 1rem;
-	}
-`;
-
-const FormButton = styled.button`
-	width: 100%;
 `;
