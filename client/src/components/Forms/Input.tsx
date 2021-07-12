@@ -4,7 +4,7 @@ import stylesConfig from '../../utils/stylesConfig';
 
 type Props = {
 	inputType: 'basic' | 'textarea';
-	type?: 'text' | 'email';
+	type?: 'text' | 'email' | 'password';
 	name: string;
 	label: string;
 	value: string | string[];
@@ -58,7 +58,7 @@ const inputStyles = css`
 	width: 100%;
 
 	&:focus {
-		box-shadow: 0 0 0 2px rgba(14, 2, 179, 0.3);
+		box-shadow: ${stylesConfig.inputFocusStyle};
 	}
 `;
 

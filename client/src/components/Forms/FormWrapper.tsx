@@ -21,10 +21,11 @@ function FormWrapper({ title, children, handleSubmit, style }: Props) {
 export default FormWrapper;
 
 const FormComponent = styled.form`
-	flex: 1;
 	padding: 2rem;
 	border-radius: 4px;
 	box-shadow: ${stylesConfig.shadowNormal};
+	width: 100%;
+	max-width: 38rem;
 `;
 
 const FormTitle = styled.h3`

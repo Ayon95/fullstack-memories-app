@@ -32,10 +32,9 @@ const WelcomeContent = styled.main`
 	width: 100%;
 	max-width: 90rem;
 	display: flex;
+	justify-content: space-between;
 `;
 const BrandIntro = styled.div`
-	flex: 1.5;
-
 	h1 {
 		font-size: 4rem;
 		margin-bottom: 0.5rem;

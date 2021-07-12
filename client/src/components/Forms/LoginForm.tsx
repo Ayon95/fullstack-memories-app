@@ -1,7 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { RootState } from '../../redux/store';
 import Button from '../generic/Button';
@@ -17,7 +16,7 @@ function LoginForm() {
 		e.preventDefault();
 	}
 	return (
-		<FormWrapper title="Log In" handleSubmit={handleSubmit}>
+		<FormWrapper title="Sign Up" handleSubmit={handleSubmit}>
 			<Input
 				inputType="basic"
 				type="text"
@@ -41,12 +40,8 @@ function LoginForm() {
 				color="primary"
 				type="submit"
 				isDisabled={status === 'pending'}
-				style={{ width: '100%', marginBottom: '2rem' }}
+				style={{ width: '100%' }}
 			/>
-
-			<SignupText>
-				Don't have an account ? <Link to="/signup">Sign up</Link>
-			</SignupText>
 		</FormWrapper>
 	);
 }
