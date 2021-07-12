@@ -21,12 +21,6 @@ const GlobalStyles = createGlobalStyle`
         padding: 2rem;
     }
 
-    .App {
-        width: 100%;
-        max-width: 150rem;
-        margin: 0 auto;
-    }
-
     .btn {
         text-transform: uppercase;
         border-radius: 4px;

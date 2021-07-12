@@ -73,7 +73,11 @@ function Form() {
 		resetForm();
 	}
 	return (
-		<FormWrapper title={currentPostId ? 'Edit' : 'Add' + ' A Memory'} handleSubmit={handleSubmit}>
+		<FormWrapper
+			title={currentPostId ? 'Edit' : 'Add' + ' A Memory'}
+			handleSubmit={handleSubmit}
+			style={{ alignSelf: 'flex-start' }}
+		>
 			<Input
 				inputType="basic"
 				type="text"

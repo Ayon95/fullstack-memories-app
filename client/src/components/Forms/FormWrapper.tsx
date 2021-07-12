@@ -6,11 +6,12 @@ type Props = {
 	title: string;
 	children: React.ReactNode;
 	handleSubmit: React.FormEventHandler<HTMLFormElement>;
+	style?: React.CSSProperties;
 };
 
-function FormWrapper({ title, children, handleSubmit }: Props) {
+function FormWrapper({ title, children, handleSubmit, style }: Props) {
 	return (
-		<FormComponent autoComplete="off" onSubmit={handleSubmit}>
+		<FormComponent autoComplete="off" onSubmit={handleSubmit} style={style}>
 			<FormTitle>{title}</FormTitle>
 			{children}
 		</FormComponent>
@@ -21,7 +22,6 @@ export default FormWrapper;
 
 const FormComponent = styled.form`
 	flex: 1;
-	align-self: flex-start;
 	padding: 2rem;
 	border-radius: 4px;
 	box-shadow: ${stylesConfig.shadowNormal};

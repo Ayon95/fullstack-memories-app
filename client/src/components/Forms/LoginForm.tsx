@@ -37,11 +37,11 @@ function LoginForm() {
 			/>
 
 			<Button
-				text="Submit"
+				text="Log In"
 				color="primary"
 				type="submit"
 				isDisabled={status === 'pending'}
-				style={{ width: '100%' }}
+				style={{ width: '100%', marginBottom: '2rem' }}
 			/>
 
 			<SignupText>

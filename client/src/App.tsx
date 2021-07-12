@@ -9,21 +9,17 @@ function App() {
 	return (
 		<>
 			<GlobalStyles />
-			<div className="App">
-				<Navbar />
+			<Router>
+				<Switch>
+					<Route path="/home">
+						<Home />
+					</Route>
 
-				<Router>
-					<Switch>
-						<Route path="/home">
-							<Home />
-						</Route>
-
-						<Route exact path="/">
-							<Welcome />
-						</Route>
-					</Switch>
-				</Router>
-			</div>
+					<Route exact path="/">
+						<Welcome />
+					</Route>
+				</Switch>
+			</Router>
 		</>
 	);
 }

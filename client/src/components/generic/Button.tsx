@@ -1,5 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 import stylesConfig from '../../utils/stylesConfig';
 
 type Props = {
@@ -8,9 +9,18 @@ type Props = {
 	type?: 'button' | 'submit' | 'reset';
 	isDisabled?: boolean;
 	style?: React.CSSProperties;
+	isLink?: boolean;
 };
 
 function Button(props: Props) {
+	if (props.isLink) {
+		return (
+			<LinkButtonComponent to="/signup" color={props.color}>
+				{props.text}
+			</LinkButtonComponent>
+		);
+	}
+
 	return (
 		<ButtonComponent
 			type={props.type || 'button'}
@@ -25,7 +35,7 @@ function Button(props: Props) {
 
 export default Button;
 
-const ButtonComponent = styled.button`
+const buttonStyles = css<{ color: string }>`
 	text-transform: uppercase;
 	border-radius: 4px;
 	font-family: 'Roboto';
@@ -44,9 +54,19 @@ const ButtonComponent = styled.button`
 				? stylesConfig.colorPrimaryLight1
 				: stylesConfig.colorSecondaryLight1};
 	}
+`;
+
+const ButtonComponent = styled.button`
+	${buttonStyles}
 
 	&:disabled {
 		cursor: not-allowed;
 		background-color: ${stylesConfig.colorGrey2};
 	}
+`;
+
+const LinkButtonComponent = styled(Link)`
+	${buttonStyles}
+	text-decoration: none;
+	display: inline-block;
 `;
