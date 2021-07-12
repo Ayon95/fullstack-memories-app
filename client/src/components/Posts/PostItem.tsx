@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { postsActions } from '../../redux/slices/posts/postsSlice';
 import { useState } from 'react';
 import { deletePost, updateLikes } from './../../redux/slices/posts/postsThunks';
+import IconTextButton from '../generic/IconTextButton';
 
 type Props = { post: Post };
 
@@ -46,29 +47,26 @@ function PostItem({ post }: Props) {
 				<PostDescription>{post.description}</PostDescription>
 			</PostContent>
 			<PostActions>
-				<IconButton color={stylesConfig.colorPrimary} onClick={() => handleClickLike(post._id)}>
-					{isLiked ? (
-						<>
-							<FaThumbsDown />
-							Unlike
-						</>
-					) : (
-						<>
-							<FaThumbsUp />
-							Like
-						</>
-					)}
-				</IconButton>
+				<IconTextButton
+					text={isLiked ? 'Unlike' : 'Like'}
+					icon={isLiked ? FaThumbsDown : FaThumbsUp}
+					color={stylesConfig.colorPrimary}
+					handleClick={() => handleClickLike(post._id)}
+				/>
 
-				<IconButton color={stylesConfig.colorGrey3} onClick={() => handleClickEdit(post._id)}>
-					<FaEdit />
-					Edit
-				</IconButton>
+				<IconTextButton
+					text="Edit"
+					icon={FaEdit}
+					color={stylesConfig.colorGrey3}
+					handleClick={() => handleClickEdit(post._id)}
+				/>
 
-				<IconButton color={stylesConfig.colorSecondary} onClick={() => handleClickDelete(post._id)}>
-					<FaTrashAlt />
-					Delete
-				</IconButton>
+				<IconTextButton
+					text="Delete"
+					icon={FaTrashAlt}
+					color={stylesConfig.colorSecondary}
+					handleClick={() => handleClickDelete(post._id)}
+				/>
 			</PostActions>
 		</PostWrapper>
 	);
