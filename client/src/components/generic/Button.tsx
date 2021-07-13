@@ -10,13 +10,13 @@ type Props = {
 	isDisabled?: boolean;
 	style?: React.CSSProperties;
 	isLink?: boolean;
-	handleClick?: React.MouseEventHandler<HTMLButtonElement>;
+	handleClick?: React.MouseEventHandler;
 };
 
 function Button(props: Props) {
 	if (props.isLink) {
 		return (
-			<LinkButtonComponent to="/signup" color={props.color}>
+			<LinkButtonComponent to="/signup" color={props.color} onClick={props.handleClick}>
 				{props.text}
 			</LinkButtonComponent>
 		);

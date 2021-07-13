@@ -8,7 +8,7 @@ export type User = {
 
 // shape of auth state
 export type AuthSliceState = {
-	user: User;
+	user: User | null;
 	status: 'idle' | 'pending' | 'success' | 'failure';
 	error: string;
 };

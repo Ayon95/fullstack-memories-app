@@ -22,3 +22,13 @@ export function getUser() {
 		dispatch(authActions.setUser(JSON.parse(user)));
 	};
 }
+
+// this thunk will be responsible for logging the user out (remove user from local storage and redux store)
+export function logOut() {
+	return function (dispatch: AppDispatch) {
+		// remove user from local storage
+		localStorage.removeItem('memoriesUser');
+		// remove user from redux store
+		dispatch(authActions.removeUser());
+	};
+}

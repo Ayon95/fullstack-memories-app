@@ -1,14 +1,25 @@
 import React from 'react';
+import { useEffect } from 'react';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import LoginForm from '../components/Forms/LoginForm';
 import SignupForm from '../components/Forms/SignupForm';
-import Button from '../components/generic/Button';
+import Button from '../components/Generic/Button';
 import Modal from '../components/Modal/Modal';
+import { RootState } from '../redux/store';
 import stylesConfig from '../utils/stylesConfig';
 
 function Welcome() {
 	const [shouldShowModal, setShouldShowModal] = useState(false);
+	const history = useHistory();
+	const currentUser = useSelector((state: RootState) => state.auth.user);
+
+	// if the logged-in user tries to go to the Welcome page by changing the url, then redirect the user to Home page
+	useEffect(() => {
+		if (currentUser) history.push('/home');
+	}, [currentUser, history]);
 
 	function openModal() {
 		setShouldShowModal(true);

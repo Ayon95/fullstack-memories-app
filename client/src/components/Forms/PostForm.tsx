@@ -7,7 +7,7 @@ import { BasePost } from '../../utils/types';
 import { RootState } from '../../redux/store';
 import { createPost, updatePost } from '../../redux/slices/posts/postsThunks';
 import { useEffect } from 'react';
-import Button from '../generic/Button';
+import Button from '../Generic/Button';
 import FormWrapper from './FormWrapper';
 
 function Form() {

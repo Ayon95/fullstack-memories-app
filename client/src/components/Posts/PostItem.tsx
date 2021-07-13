@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import { postsActions } from '../../redux/slices/posts/postsSlice';
 import { useState } from 'react';
 import { deletePost, updateLikes } from './../../redux/slices/posts/postsThunks';
-import IconTextButton from '../generic/IconTextButton';
+import IconTextButton from '../Generic/IconTextButton';
 
 type Props = { post: Post };
 

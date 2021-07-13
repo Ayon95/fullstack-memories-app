@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import Post from './PostItem';
 import { RootState } from '../../redux/store';
 import styled from 'styled-components';
-import LoadingSpinner from '../generic/LoadingSpinner';
+import LoadingSpinner from '../Generic/LoadingSpinner';
 
 function Posts() {
 	const posts = useSelector((state: RootState) => state.posts.postItems);

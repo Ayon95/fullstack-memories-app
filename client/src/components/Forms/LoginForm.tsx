@@ -1,12 +1,13 @@
 import React from 'react';
 import { useState } from 'react';
-import Button from '../generic/Button';
+import Button from '../Generic/Button';
 import FormWrapper from './FormWrapper';
 import Input from './Input';
 import { GoogleLogin, GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
 import { GoogleLoginFailedResponse, User } from '../../utils/types';
 import { useDispatch } from 'react-redux';
 import { saveUser } from '../../redux/slices/auth/authThunks';
+import { useHistory } from 'react-router-dom';
 
 // google client id -> 386122524309-7bg288ov7q2j6sfsjalmog0i4j55ea4o.apps.googleusercontent.com
 
@@ -14,6 +15,7 @@ function LoginForm() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
+	const history = useHistory();
 	const dispatch = useDispatch();
 
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -33,6 +35,8 @@ function LoginForm() {
 		};
 		// save user to local storage and set the user in redux store
 		dispatch(saveUser(user));
+		// take user to home page
+		history.push('/home');
 	}
 
 	function handleGoogleLoginFailure(response: GoogleLoginFailedResponse) {
@@ -42,7 +46,7 @@ function LoginForm() {
 		<FormWrapper title="Log In" handleSubmit={handleSubmit}>
 			<Input
 				inputType="basic"
-				type="text"
+				type="email"
 				name="email"
 				label="Email"
 				value={email}
@@ -51,7 +55,7 @@ function LoginForm() {
 
 			<Input
 				inputType="basic"
-				type="text"
+				type="password"
 				name="password"
 				label="Password"
 				value={password}

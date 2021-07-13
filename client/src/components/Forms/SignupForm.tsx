@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
-import Button from '../generic/Button';
+import Button from '../Generic/Button';
 import FormWrapper from './FormWrapper';
 import Input from './Input';
 
