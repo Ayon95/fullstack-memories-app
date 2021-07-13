@@ -14,3 +14,20 @@ export type PostDoc = BasePost & {
 	likes: number;
 	createdAt: string;
 };
+
+// shape of the user object expected to be present in the POST request to create a new user
+export type UserRequest = {
+	firstName: string;
+	lastName: string;
+	email: string;
+	password: string;
+};
+
+// shape of User doc
+export type UserDoc = {
+	_id: string;
+	firstName: string;
+	lastName: string;
+	email: string;
+	passwordHash: string;
+};

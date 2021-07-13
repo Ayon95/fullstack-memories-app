@@ -1,4 +1,4 @@
-import mongoose, { Document } from 'mongoose';
+import mongoose from 'mongoose';
 import { PostDoc } from '../utils/types';
 
 // schema for post documents

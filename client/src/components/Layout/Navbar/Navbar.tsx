@@ -1,14 +1,17 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { logOut } from '../../../redux/slices/auth/authThunks';
+import { RootState } from '../../../redux/store';
 import stylesConfig from '../../../utils/stylesConfig';
 import Button from '../../Generic/Button';
 
 function Navbar() {
 	const dispatch = useDispatch();
 	const history = useHistory();
+
+	const currentUser = useSelector((state: RootState) => state.auth.user);
 
 	function handleClickLogout() {
 		// dispatch action to log the user out
@@ -18,7 +21,7 @@ function Navbar() {
 	}
 	return (
 		<NavbarContainer>
-			<Title>Memories</Title>
+			<Title>Hello, {currentUser?.firstName}</Title>
 			<NavLinks>
 				<Button text="Log Out" color="secondary" handleClick={handleClickLogout} />
 			</NavLinks>
