@@ -15,12 +15,16 @@ export type PostDoc = BasePost & {
 	createdAt: string;
 };
 
-// shape of the user object expected to be present in the POST request to create a new user
-export type UserRequest = {
-	firstName: string;
-	lastName: string;
+// shape of the user credentials object expected to be present in the POST request to log an existing user in
+export type UserCredentials = {
 	email: string;
 	password: string;
+};
+
+// shape of the user object expected to be present in the POST request to create a new user
+export type UserSignupRequest = UserCredentials & {
+	firstName: string;
+	lastName: string;
 };
 
 // shape of User doc
