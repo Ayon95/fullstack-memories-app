@@ -1,8 +1,10 @@
+import 'dotenv/config';
 import config from './utils/config';
 import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import postRoutes from './routes/posts';
+import userRoutes from './routes/user';
 
 // create an express app
 const app = express();
@@ -29,6 +31,9 @@ app.use(cors());
 
 // applying routes related to posts
 app.use('/posts', postRoutes);
+
+// applying routes related to user authentication and authorization
+app.use('/user', userRoutes);
 
 // applying middleware to handle requests to unknown endpoints
 app.use((request: Request, response: Response) => {

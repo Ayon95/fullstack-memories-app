@@ -28,7 +28,7 @@ export async function logIn(request: Request, response: Response) {
 		// the token payload contains necessary user information that the server can later use to verify the user who made the request
 		// the token expires in 1 hours
 		const payload = { email: user.email, id: user._id };
-		const token = jwt.sign(payload, process.env.SECRET, { expiresIn: '1h' });
+		const token = jwt.sign(payload, process.env.SECRET!, { expiresIn: '1h' });
 
 		response
 			.status(200)
@@ -57,7 +57,7 @@ export async function signUp(request: Request, response: Response) {
 			passwordHash,
 		});
 		// generating a signed token
-		const token = jwt.sign({ email: newUser.email, id: newUser._id }, process.env.SECRET);
+		const token = jwt.sign({ email: newUser.email, id: newUser._id }, process.env.SECRET!);
 
 		response.status(200).json({
 			token,
