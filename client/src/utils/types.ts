@@ -1,3 +1,18 @@
+// shape of user object
+export type User = {
+	userId: string;
+	token: string;
+	firstName: string;
+	lastName: string;
+};
+
+// shape of auth state
+export type AuthSliceState = {
+	user: User;
+	status: 'idle' | 'pending' | 'success' | 'failure';
+	error: string;
+};
+
 // shape of base post object
 export type BasePost = {
 	title: string;
@@ -27,5 +42,9 @@ export type PostsSliceState = {
 // shape of error object sent as response by the server
 export type ErrorObj = { errorMessage: string };
 
-// shape of props object for IconButton
-export type IconButtonProps = { readonly color: string };
+// shape of the error object sent by Google in case of failed login
+export type GoogleLoginFailedResponse = {
+	error: string;
+	idpId: string;
+	type: string;
+};

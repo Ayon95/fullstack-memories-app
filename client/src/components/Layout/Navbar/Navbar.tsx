@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import stylesConfig from '../../utils/stylesConfig';
+import stylesConfig from '../../../utils/stylesConfig';
 
 function Navbar() {
 	return (
@@ -20,5 +20,3 @@ const NavbarContainer = styled.header`
 `;
 
 const Title = styled.h2``;
-
-const NavButtons = styled.div``;

@@ -20,7 +20,7 @@ function IconTextButton({ text, icon: Icon, color, handleClick }: Props) {
 
 export default IconTextButton;
 
-const ButtonComponent = styled.button`
+const ButtonComponent = styled.button<{ color: string }>`
 	font-size: 1.6rem;
 	color: ${props => props.color};
 	font-family: 'Roboto';

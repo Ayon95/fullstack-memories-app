@@ -1,5 +1,4 @@
 import { AnyAction, AsyncThunk } from '@reduxjs/toolkit';
-import { BasePost } from '../utils/types';
 
 // type for the return value of createAsyncThunk
 type GenericAsyncThunk = AsyncThunk<unknown, unknown, { rejectValue: string }>;

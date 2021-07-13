@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Navbar from '../Navbar/Navbar';
+import Navbar from './Navbar/Navbar';
 
 type Props = { children: React.ReactNode };
 

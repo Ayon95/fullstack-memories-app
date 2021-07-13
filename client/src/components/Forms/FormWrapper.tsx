@@ -30,5 +30,5 @@ const FormComponent = styled.form`
 const FormTitle = styled.h3`
 	text-align: center;
 	font-size: 2.2rem;
-	margin-bottom: 1rem;
+	margin-bottom: 2rem;
 `;

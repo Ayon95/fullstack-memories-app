@@ -1,7 +1,7 @@
 import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
 import styled from 'styled-components';
-import { IconButtonProps, Post } from '../../utils/types';
+import { Post } from '../../utils/types';
 import { FaThumbsUp, FaTrashAlt, FaEdit, FaThumbsDown } from 'react-icons/fa';
 import stylesConfig from '../../utils/stylesConfig';
 import { useDispatch } from 'react-redux';
@@ -30,7 +30,7 @@ function PostItem({ post }: Props) {
 		if (isLiked) dispatch(updateLikes({ id, likes: post.likes - 1 }));
 		if (!isLiked) dispatch(updateLikes({ id, likes: post.likes + 1 }));
 
-		setIsLiked(currentState => !currentState);
+		setIsLiked(prevState => !prevState);
 	}
 	return (
 		<PostWrapper>
@@ -124,34 +124,4 @@ const PostActions = styled.div`
 	justify-content: space-between;
 	padding: 0 2rem 2rem 2rem;
 	margin-top: 2rem;
-`;
-
-const IconButton = styled.button<IconButtonProps>`
-	font-size: 1.6rem;
-	color: ${props => props.color};
-	font-family: 'Roboto';
-	text-transform: uppercase;
-	background: transparent;
-	border: none;
-	display: flex;
-	cursor: pointer;
-	position: relative;
-	padding: 0.5rem;
-
-	&:hover::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		border-radius: 4px;
-		background-color: currentColor;
-		opacity: 0.1;
-	}
-
-	svg {
-		fill: currentColor;
-		margin-right: 0.5rem;
-	}
 `;

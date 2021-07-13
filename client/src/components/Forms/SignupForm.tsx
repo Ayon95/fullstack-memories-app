@@ -1,7 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import styled from 'styled-components';
 import Button from '../generic/Button';
 import FormWrapper from './FormWrapper';
 import Input from './Input';
@@ -23,23 +22,24 @@ function SignupForm({ closeModal }: Props) {
 
 	return (
 		<FormWrapper title="Sign Up" handleSubmit={handleSubmit} style={{ backgroundColor: '#eee' }}>
-			<Input
-				inputType="basic"
-				type="text"
-				name="firstName"
-				label="First Name"
-				value={firstName}
-				setValue={setFirstName}
-			/>
-
-			<Input
-				inputType="basic"
-				type="text"
-				name="lasttName"
-				label="Last Name"
-				value={lastName}
-				setValue={setLastName}
-			/>
+			<NameInputs>
+				<Input
+					inputType="basic"
+					type="text"
+					name="firstName"
+					label="First Name"
+					value={firstName}
+					setValue={setFirstName}
+				/>
+				<Input
+					inputType="basic"
+					type="text"
+					name="lasttName"
+					label="Last Name"
+					value={lastName}
+					setValue={setLastName}
+				/>
+			</NameInputs>
 
 			<Input
 				inputType="basic"
@@ -87,3 +87,11 @@ function SignupForm({ closeModal }: Props) {
 }
 
 export default SignupForm;
+
+const NameInputs = styled.div`
+	display: flex;
+
+	& > *:not(:last-child) {
+		margin-right: 1rem;
+	}
+`;

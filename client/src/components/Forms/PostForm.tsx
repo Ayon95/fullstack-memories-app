@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import Input from './Input';
-import stylesConfig from '../../utils/stylesConfig';
 import { convertToBase64 } from '../../utils/helpers';
 import { useDispatch, useSelector } from 'react-redux';
 import { postsActions } from '../../redux/slices/posts/postsSlice';
@@ -74,7 +72,7 @@ function Form() {
 	}
 	return (
 		<FormWrapper
-			title={currentPostId ? 'Edit' : 'Add' + ' A Memory'}
+			title={currentPostId ? 'Edit A Memory' : 'Add A Memory'}
 			handleSubmit={handleSubmit}
 			style={{ alignSelf: 'flex-start' }}
 		>
@@ -126,17 +124,3 @@ function Form() {
 }
 
 export default Form;
-
-const FormComponent = styled.form`
-	flex: 1;
-	align-self: flex-start;
-	padding: 2rem;
-	border-radius: 4px;
-	box-shadow: ${stylesConfig.shadowNormal};
-`;
-
-const FormTitle = styled.h3`
-	text-align: center;
-	font-size: 2.2rem;
-	margin-bottom: 1rem;
-`;
