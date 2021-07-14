@@ -18,7 +18,7 @@ export type BasePost = {
 // shape of Post doc
 export type PostDoc = BasePost & {
 	_id: string;
-	likes: number;
+	likedBy: string[];
 	createdAt: string;
 };
 

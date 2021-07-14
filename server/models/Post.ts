@@ -8,7 +8,8 @@ const postSchema = new mongoose.Schema<PostDoc>({
 	author: { type: String, required: true },
 	tags: [String],
 	selectedFile: String,
-	likes: { type: Number, default: 0 },
+	// an array containing the ids of the users who will like the post
+	likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 	createdAt: { type: Date },
 });
 
