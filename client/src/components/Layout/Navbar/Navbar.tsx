@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { logOut } from '../../../redux/slices/auth/authThunks';
+import { authActions } from '../../../redux/slices/auth/authSlice';
 import { RootState } from '../../../redux/store';
 import stylesConfig from '../../../utils/stylesConfig';
 import Button from '../../Generic/Button';
@@ -14,8 +14,10 @@ function Navbar() {
 	const currentUser = useSelector((state: RootState) => state.auth.user);
 
 	function handleClickLogout() {
-		// dispatch action to log the user out
-		dispatch(logOut());
+		// remove user from local storage
+		localStorage.removeItem('memoriesUser');
+		// remove user from redux store
+		dispatch(authActions.removeUser());
 		// redirect user to Welcome page
 		history.push('/');
 	}

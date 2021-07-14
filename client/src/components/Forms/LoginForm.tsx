@@ -6,8 +6,9 @@ import Input from './Input';
 import { GoogleLogin, GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
 import { GoogleLoginFailedResponse, User } from '../../utils/types';
 import { useDispatch } from 'react-redux';
-import { saveUser } from '../../redux/slices/auth/authThunks';
+import { logIn } from '../../redux/slices/auth/authThunks';
 import { useHistory } from 'react-router-dom';
+import { authActions } from '../../redux/slices/auth/authSlice';
 
 // google client id -> 386122524309-7bg288ov7q2j6sfsjalmog0i4j55ea4o.apps.googleusercontent.com
 
@@ -20,6 +21,16 @@ function LoginForm() {
 
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
+
+		if (![email, password].every(Boolean)) {
+			return console.log('email or password is missing for login');
+		}
+
+		// dispatch action to log the user in
+		dispatch(logIn({ email, password }));
+
+		// redirect user to home page
+		history.push('/home');
 	}
 
 	function handleGoogleLoginSuccess(response: GoogleLoginResponse | GoogleLoginResponseOffline) {
@@ -33,8 +44,10 @@ function LoginForm() {
 			firstName: profileData.givenName,
 			lastName: profileData.familyName,
 		};
-		// save user to local storage and set the user in redux store
-		dispatch(saveUser(user));
+		// save user to local storage
+		localStorage.setItem('memoriesUser', JSON.stringify(user));
+		// set the user in redux store
+		dispatch(authActions.setUser(user));
 		// take user to home page
 		history.push('/home');
 	}

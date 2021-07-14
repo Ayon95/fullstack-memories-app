@@ -1,34 +1,53 @@
-import { User } from '../../../utils/types';
-import { AppDispatch } from '../../store';
-import { authActions } from './authSlice';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { ErrorObj, User, UserRequestBody } from '../../../utils/types';
 
-// this thunk will be responsible for saving user to local storage and setting user in redux store
-export function saveUser(user: User) {
-	return function (dispatch: AppDispatch) {
+const baseUrl = 'http://localhost:5000/user';
+
+// this thunk will be responsible for sending a POST request to create a new user
+export const signUp = createAsyncThunk<User, UserRequestBody, { rejectValue: string }>(
+	'auth/signUp',
+	async (userData, thunkAPI) => {
+		const response = await fetch(`${baseUrl}/signup`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(userData),
+		});
+
+		if (!response.ok) {
+			const error = (await response.json()) as ErrorObj;
+			return thunkAPI.rejectWithValue(error.errorMessage);
+		}
+
+		// successful request
+		const data = (await response.json()) as User;
 		// saving user to local storage
-		localStorage.setItem('memoriesUser', JSON.stringify(user));
-		// dispatching action to set user in redux store
-		dispatch(authActions.setUser(user));
-	};
-}
+		localStorage.setItem('memoriesUser', JSON.stringify(data));
 
-// this thunk will be responsible for getting user (if any) from local storage, and setting that user in redux store
-export function getUser() {
-	return function (dispatch: AppDispatch) {
-		// getting user from local storage
-		const user = localStorage.getItem('memoriesUser');
-		if (!user) return;
-		// dispatching action to set user in redux store if user exists
-		dispatch(authActions.setUser(JSON.parse(user)));
-	};
-}
+		return data;
+	}
+);
 
-// this thunk will be responsible for logging the user out (remove user from local storage and redux store)
-export function logOut() {
-	return function (dispatch: AppDispatch) {
-		// remove user from local storage
-		localStorage.removeItem('memoriesUser');
-		// remove user from redux store
-		dispatch(authActions.removeUser());
-	};
-}
+// this thunk will be responsible for sending a POST request to log the user in
+export const logIn = createAsyncThunk<
+	User,
+	{ email: string; password: string },
+	{ rejectValue: string }
+>('auth/login', async (userCredentials, thunkAPI) => {
+	const response = await fetch(`${baseUrl}/login`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(userCredentials),
+	});
+
+	if (!response.ok) {
+		const error = (await response.json()) as ErrorObj;
+		return thunkAPI.rejectWithValue(error.errorMessage);
+	}
+
+	// successful request
+	const data = (await response.json()) as User;
+
+	// saving user to local storage
+	localStorage.setItem('memoriesUser', JSON.stringify(data));
+	return data;
+});

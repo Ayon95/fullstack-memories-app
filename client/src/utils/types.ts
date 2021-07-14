@@ -6,6 +6,14 @@ export type User = {
 	lastName: string;
 };
 
+// shape of request body that will be sent with POST request to sign up
+export type UserRequestBody = {
+	firstName: string;
+	lastName: string;
+	email: string;
+	password: string;
+};
+
 // shape of auth state
 export type AuthSliceState = {
 	user: User | null;
