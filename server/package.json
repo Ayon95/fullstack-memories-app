@@ -13,6 +13,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"@types/bcrypt": "^5.0.0",
+		"@types/express-serve-static-core": "^4.17.24",
 		"@types/jsonwebtoken": "^8.5.4",
 		"bcrypt": "^5.0.1",
 		"cors": "^2.8.5",

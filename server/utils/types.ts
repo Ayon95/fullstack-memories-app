@@ -1,3 +1,10 @@
+// extending the Request interface so that it may have the userId custom property
+declare module 'express-serve-static-core' {
+	export interface Request {
+		userId?: string;
+	}
+}
+
 // shape of a post without _id, _v, likes, and createdAt
 // this is the expected request body for POST request
 export type BasePost = {
@@ -34,4 +41,10 @@ export type UserDoc = {
 	lastName: string;
 	email: string;
 	passwordHash: string;
+};
+
+// shape of the token payload
+export type TokenPayload = {
+	email: string;
+	id: string;
 };

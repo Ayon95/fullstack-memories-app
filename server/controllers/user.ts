@@ -3,6 +3,7 @@ import User from '../models/User';
 import { UserCredentials, UserDoc, UserSignupRequest } from '../utils/types';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import config from '../utils/config';
 
 export async function logIn(request: Request, response: Response) {
 	const userCredentials: UserCredentials = request.body;
@@ -28,7 +29,7 @@ export async function logIn(request: Request, response: Response) {
 		// the token payload contains necessary user information that the server can later use to verify the user who made the request
 		// the token expires in 1 hours
 		const payload = { email: user.email, id: user._id };
-		const token = jwt.sign(payload, process.env.SECRET!, { expiresIn: '1h' });
+		const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '1h' });
 
 		response
 			.status(200)
@@ -57,7 +58,8 @@ export async function signUp(request: Request, response: Response) {
 			passwordHash,
 		});
 		// generating a signed token
-		const token = jwt.sign({ email: newUser.email, id: newUser._id }, process.env.SECRET!);
+		const payload = { email: newUser.email, id: newUser._id };
+		const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '1h' });
 
 		response.status(200).json({
 			token,
