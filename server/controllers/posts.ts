@@ -2,7 +2,8 @@
 
 import { Request, Response } from 'express';
 import Post from '../models/Post';
-import { BasePost, PostDoc } from '../utils/types';
+import User from '../models/User';
+import { BasePost, PostDoc, UserDoc } from '../utils/types';
 
 export async function getPosts(request: Request, response: Response) {
 	try {
@@ -10,24 +11,43 @@ export async function getPosts(request: Request, response: Response) {
 		const posts = await Post.find();
 		response.status(200).json(posts);
 	} catch (error) {
-		response.status(404).json({ errorMessage: error.message });
+		response.status(404).json({ errorMessage: 'The requested url does not exist' });
 	}
 }
 
 export async function createPost(request: Request, response: Response) {
+	// request.userId is a required property in this route handler
+	// if it is missing, then that means there is a mistake here in the server
+	if (!request.userId) {
+		return response.status(500).json({ errorMessage: 'Internal server error' });
+	}
+
 	try {
+		const user = (await User.findById(request.userId)) as UserDoc;
+
 		const post: BasePost = request.body;
 		// checking if a required field is missing or not
-		if (![post.title, post.author, post.description].every(Boolean)) {
-			return response
-				.status(400)
-				.json({ errorMessage: 'Either title, author, or description is missing' });
+		if (![post.title, post.description].every(Boolean)) {
+			return response.status(400).json({ errorMessage: 'A required field is missing' });
 		}
-		// creating a new post document
-		const newPost = new Post({ ...request.body, createdAt: new Date() });
 
-		// saving the new post doc to the posts collection
-		await newPost.save();
+		// creating a new post doc
+		const newPost = await Post.create({
+			...request.body,
+			author: request.userId,
+			likedBy: [],
+			createdAt: new Date(),
+		});
+
+		// populating the author field of the newly-created post
+		Post.populate(newPost, {
+			path: 'author',
+			select: { firstName: 1, lastName: 1 },
+		});
+
+		// adding the post id to the posts array of the user
+		user.posts = [...user.posts, newPost._id];
+
 		response.status(201).json(newPost);
 	} catch (error) {
 		response.status(409).json({ errorMessage: error.message });
@@ -45,13 +65,11 @@ export async function updatePost(request: Request, response: Response) {
 		}
 
 		// checking if a required field is missing
-		if ([!post.title, post.author, post.description].every(Boolean)) {
-			return response
-				.status(400)
-				.json({ errorMessage: 'Either title, author, or description is missing' });
+		if (![post.title, post.description].every(Boolean)) {
+			return response.status(400).json({ errorMessage: 'A required field is missing' });
 		}
 		// updating the post doc
-		// if new is true, the updated document will be returned
+		// if new is set to true, the updated document will be returned
 		const updatedPost = await Post.findByIdAndUpdate(id, post, { new: true });
 		return response.json(updatedPost);
 	} catch (error) {
@@ -60,16 +78,13 @@ export async function updatePost(request: Request, response: Response) {
 }
 
 export async function updateLikes(request: Request, response: Response) {
-	// checking if there is an authorized user
 	if (!request.userId) {
-		return response
-			.status(401)
-			.json({ errorMessage: 'The user is not authorized to perform this action' });
+		return response.status(500).json({ errorMessage: 'Internal server error' });
 	}
 
 	const { id } = request.params;
 
-	// checking whether post exists or not
+	// checking whether the post exists or not
 	const postExists = await Post.exists({ _id: id });
 	if (!postExists) {
 		return response.status(404).json({ errorMessage: 'No post exists with the given id' });
@@ -81,6 +96,7 @@ export async function updateLikes(request: Request, response: Response) {
 	let updatedLikedBy: string[];
 
 	// checking if the user has already liked this post
+	// if so, then the user's id will be present in likedBy array
 	const postIsLiked = post.likedBy.includes(request.userId);
 
 	// add the user's id if the user hasn't liked the post already
@@ -88,14 +104,16 @@ export async function updateLikes(request: Request, response: Response) {
 	// remove the user's id from the list if the user has already liked the post
 	else updatedLikedBy = post.likedBy.filter(userId => userId !== request.userId);
 
-	const postData: { id: string; likes: number } = request.body;
-
 	// updating only the likedBy field of the post
 	const updatedPost = await Post.findByIdAndUpdate(id, { likedBy: updatedLikedBy }, { new: true });
 	return response.json(updatedPost);
 }
 
 export async function deletePost(request: Request, response: Response) {
+	if (!request.userId) {
+		return response.status(500).json({ errorMessage: 'Internal server error' });
+	}
+
 	const { id } = request.params;
 
 	// checking if any post with the id exists

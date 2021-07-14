@@ -5,11 +5,16 @@ import { PostDoc } from '../utils/types';
 const postSchema = new mongoose.Schema<PostDoc>({
 	title: { type: String, required: true },
 	description: { type: String, required: true },
-	author: { type: String, required: true },
+	author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 	tags: [String],
 	selectedFile: String,
 	// an array containing the ids of the users who will like the post
-	likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+	likedBy: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'User',
+		},
+	],
 	createdAt: { type: Date },
 });
 

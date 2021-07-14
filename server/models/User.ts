@@ -7,6 +7,13 @@ const userSchema = new mongoose.Schema<UserDoc>({
 	lastName: { type: String, required: true },
 	email: { type: String, required: true },
 	passwordHash: { type: String, required: true },
+	// an array containing the ids of the posts created by the user
+	posts: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Post',
+		},
+	],
 });
 
 // create a User model
