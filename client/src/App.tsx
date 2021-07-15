@@ -22,7 +22,6 @@ function App() {
 		if (tokenHasExpired) {
 			localStorage.removeItem('memoriesUser');
 			dispatch(authActions.removeUser());
-			history.push('/');
 		}
 		// dispatching action to set user in redux store if user exists
 		dispatch(authActions.setUser(user));

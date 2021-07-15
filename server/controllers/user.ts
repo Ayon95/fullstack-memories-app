@@ -29,17 +29,15 @@ export async function logIn(request: Request, response: Response) {
 		// the token payload contains necessary user information that the server can later use to verify the user who made the request
 		// the token expires in 1 hours
 		const payload = { email: user.email, id: user._id };
-		const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '1h' });
+		const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '2h' });
 
-		response
-			.status(200)
-			.json({
-				token,
-				userId: user._id,
-				firstName: user.firstName,
-				lastName: user.lastName,
-				posts: user.posts,
-			});
+		response.status(200).json({
+			token,
+			userId: user._id,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			posts: user.posts,
+		});
 	} catch {
 		response.status(500).json({ errorMessage: 'Internal server error' });
 	}
@@ -65,7 +63,7 @@ export async function signUp(request: Request, response: Response) {
 		});
 		// generating a signed token
 		const payload = { email: newUser.email, id: newUser._id };
-		const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '1h' });
+		const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '2h' });
 
 		response.status(200).json({
 			token,

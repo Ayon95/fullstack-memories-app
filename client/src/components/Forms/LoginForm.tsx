@@ -6,9 +6,8 @@ import Input from './Input';
 import { GoogleLogin, GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
 import { GoogleLoginFailedResponse, User } from '../../utils/types';
 import { useDispatch } from 'react-redux';
-import { logIn } from '../../redux/slices/auth/authThunks';
+import { logIn, logInGoogle } from '../../redux/slices/auth/authThunks';
 import { useHistory } from 'react-router-dom';
-import { authActions } from '../../redux/slices/auth/authSlice';
 
 function LoginForm() {
 	const [email, setEmail] = useState('');
@@ -32,21 +31,12 @@ function LoginForm() {
 	}
 
 	function handleGoogleLoginSuccess(response: GoogleLoginResponse | GoogleLoginResponseOffline) {
-		if (!response) return;
 		// the response properties that I need to use only exist on the interface GoogleLoginResponse
 		const successResponse = response as GoogleLoginResponse;
-		const { profileObj: profileData, tokenId: token } = successResponse;
-		const user: User = {
-			userId: profileData.googleId,
-			token,
-			firstName: profileData.givenName,
-			lastName: profileData.familyName,
-			posts: [],
-		};
-		// save user to local storage
-		localStorage.setItem('memoriesUser', JSON.stringify(user));
-		// set the user in redux store
-		dispatch(authActions.setUser(user));
+		// sending the token to the server for verifying it
+		// it will also check whether or not it needs to create a new user in the database
+		// a new user will be created if this user is logging in with Google for the first time
+		dispatch(logInGoogle(successResponse.tokenId));
 		// take user to home page
 		history.push('/home');
 	}

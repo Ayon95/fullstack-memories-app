@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Post, PostsSliceState } from '../../../utils/types';
-import { isPendingAction, isRejectedAction, updateIsFulfilledAction } from '../../matchers';
+import { isPendingAction, isRejectedAction, isUpdateFulfilledAction } from '../../matchers';
 import { createPost, deletePost, fetchAllPosts } from './postsThunks';
 
 const initialState: PostsSliceState = {
@@ -45,7 +45,7 @@ const postsSlice = createSlice({
 		});
 
 		// this matcher handles update fulfilled cases (both for actual post and post likes)
-		builder.addMatcher(updateIsFulfilledAction, (state, action: PayloadAction<Post>) => {
+		builder.addMatcher(isUpdateFulfilledAction, (state, action: PayloadAction<Post>) => {
 			state.status = 'success';
 			// generating a new array where the old post is replaced with the updated post
 			const updatedPostsList = state.postItems.map(post =>

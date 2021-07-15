@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AuthSliceState, User } from '../../../utils/types';
-import { isPendingAction, isRejectedAction } from '../../matchers';
-import { logIn, signUp } from './authThunks';
+import { isAuthFulfilledAction, isPendingAction, isRejectedAction } from '../../matchers';
 
 const initialState: AuthSliceState = {
 	user: null,
@@ -23,12 +22,7 @@ const authSlice = createSlice({
 	},
 
 	extraReducers: builder => {
-		builder.addCase(signUp.fulfilled, (state, action) => {
-			state.status = 'success';
-			state.user = action.payload;
-		});
-
-		builder.addCase(logIn.fulfilled, (state, action) => {
+		builder.addMatcher(isAuthFulfilledAction, (state, action: PayloadAction<User>) => {
 			state.status = 'success';
 			state.user = action.payload;
 		});

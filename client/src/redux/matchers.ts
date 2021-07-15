@@ -21,6 +21,11 @@ export function isRejectedAction(action: AnyAction): action is RejectedAction {
 }
 
 // matcher function that matches all actions whose type contains 'update' and ends with '/fulfilled'
-export function updateIsFulfilledAction(action: AnyAction): action is FulfilledAction {
+export function isUpdateFulfilledAction(action: AnyAction): action is FulfilledAction {
 	return action.type.includes('update') && action.type.endsWith('/fulfilled');
+}
+
+// matcher function that matches all actions whose type contains 'auth' and ends with '/fulfilled'
+export function isAuthFulfilledAction(action: AnyAction): action is FulfilledAction {
+	return action.type.includes('auth') && action.type.endsWith('/fulfilled');
 }

@@ -51,3 +51,26 @@ export const logIn = createAsyncThunk<
 	localStorage.setItem('memoriesUser', JSON.stringify(data));
 	return data;
 });
+
+// this thunk will be responsible for sending a POST request to log the user in with Google
+export const logInGoogle = createAsyncThunk<User, string, { rejectValue: string }>(
+	'auth/loginGoogle',
+	async (token, thunkAPI) => {
+		const response = await fetch(`${baseUrl}/login-google`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ token }),
+		});
+
+		if (!response.ok) {
+			const error = (await response.json()) as ErrorObj;
+			return thunkAPI.rejectWithValue(error.errorMessage);
+		}
+
+		const data = (await response.json()) as User;
+
+		// saving user to local storage
+		localStorage.setItem('memoriesUser', JSON.stringify(data));
+		return data;
+	}
+);
