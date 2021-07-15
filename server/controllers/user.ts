@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import User from '../models/User';
+import NativeUser from '../models/User/NativeUser';
 import { UserCredentials, UserDoc, UserSignupRequest } from '../utils/types';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -14,7 +14,7 @@ export async function logIn(request: Request, response: Response) {
 
 	try {
 		// finding the corresponding user doc from the database
-		const user = await User.findOne({ email: userCredentials.email });
+		const user = await NativeUser.findOne({ email: userCredentials.email });
 		// checking whether such a user exists or not
 		if (!user) {
 			return response.status(404).json({ errorMessage: 'No user with this email exists' });
@@ -48,14 +48,14 @@ export async function signUp(request: Request, response: Response) {
 
 	try {
 		// checking if a user already exists with the provided email
-		const existingUser = await User.findOne({ email: userData.email });
+		const existingUser = await NativeUser.findOne({ email: userData.email });
 		if (existingUser) {
 			return response.status(400).json({ errorMessage: 'A user with this email already exists' });
 		}
 		// generating a password hash with the specified number of salt rounds
 		const passwordHash = await bcrypt.hash(userData.password, 12);
 		// creating a new user
-		const newUser: UserDoc = await User.create({
+		const newUser: UserDoc = await NativeUser.create({
 			firstName: userData.firstName,
 			lastName: userData.lastName,
 			email: userData.email,

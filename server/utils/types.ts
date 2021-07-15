@@ -48,8 +48,21 @@ export interface UserDoc extends mongoose.Document {
 	posts: string[];
 }
 
-// shape of the token payload
-export type TokenPayload = {
+// shape of Base User doc
+export interface BaseUserDoc extends mongoose.Document {
+	firstName: string;
+	lastName: string;
 	email: string;
-	id: string;
-};
+	posts: string[];
+	userType: 'NativeUser' | 'GoogleUser';
+}
+
+// shape of Native User doc
+export interface NativeUserDoc extends BaseUserDoc {
+	passwordHash: string;
+}
+
+// shape of Google User doc
+export interface GoogleUserDoc extends BaseUserDoc {
+	googleId: string;
+}
