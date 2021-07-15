@@ -10,8 +10,6 @@ import { logIn } from '../../redux/slices/auth/authThunks';
 import { useHistory } from 'react-router-dom';
 import { authActions } from '../../redux/slices/auth/authSlice';
 
-// google client id -> 386122524309-7bg288ov7q2j6sfsjalmog0i4j55ea4o.apps.googleusercontent.com
-
 function LoginForm() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -43,6 +41,7 @@ function LoginForm() {
 			token,
 			firstName: profileData.givenName,
 			lastName: profileData.familyName,
+			posts: [],
 		};
 		// save user to local storage
 		localStorage.setItem('memoriesUser', JSON.stringify(user));

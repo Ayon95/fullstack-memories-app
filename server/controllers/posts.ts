@@ -8,9 +8,11 @@ import { BasePost, PostDoc, UserDoc } from '../utils/types';
 export async function getPosts(request: Request, response: Response) {
 	try {
 		// getting all the posts from the posts collection
-		const posts = await Post.find();
-		response.status(200).json(posts);
+		// also populating the author field of each post with _id, firstName, and lastName
+		const posts = await Post.find().populate('author', { _id: 1, firstName: 1, lastName: 1 });
+		response.json(posts);
 	} catch (error) {
+		console.log(error);
 		response.status(404).json({ errorMessage: 'The requested url does not exist' });
 	}
 }
@@ -40,13 +42,16 @@ export async function createPost(request: Request, response: Response) {
 		});
 
 		// populating the author field of the newly-created post
-		Post.populate(newPost, {
+		await Post.populate(newPost, {
 			path: 'author',
-			select: { firstName: 1, lastName: 1 },
+			select: { _id: 1, firstName: 1, lastName: 1 },
 		});
 
 		// adding the post id to the posts array of the user
 		user.posts = [...user.posts, newPost._id];
+
+		// saving the user
+		await user.save();
 
 		response.status(201).json(newPost);
 	} catch (error) {
@@ -71,6 +76,13 @@ export async function updatePost(request: Request, response: Response) {
 		// updating the post doc
 		// if new is set to true, the updated document will be returned
 		const updatedPost = await Post.findByIdAndUpdate(id, post, { new: true });
+
+		// populating the author field of the updated post
+		await Post.populate(updatedPost, {
+			path: 'author',
+			select: { _id: 1, firstName: 1, lastName: 1 },
+		});
+
 		return response.json(updatedPost);
 	} catch (error) {
 		return response.status(409).json({ errorMessage: error.message });
@@ -102,10 +114,19 @@ export async function updateLikes(request: Request, response: Response) {
 	// add the user's id if the user hasn't liked the post already
 	if (!postIsLiked) updatedLikedBy = [...post.likedBy, request.userId];
 	// remove the user's id from the list if the user has already liked the post
-	else updatedLikedBy = post.likedBy.filter(userId => userId !== request.userId);
+	else {
+		updatedLikedBy = post.likedBy.filter(userId => userId.toString() !== request.userId);
+	}
 
 	// updating only the likedBy field of the post
 	const updatedPost = await Post.findByIdAndUpdate(id, { likedBy: updatedLikedBy }, { new: true });
+
+	// populating the author field of the updated post
+	await Post.populate(updatedPost, {
+		path: 'author',
+		select: { _id: 1, firstName: 1, lastName: 1 },
+	});
+
 	return response.json(updatedPost);
 }
 
@@ -123,7 +144,13 @@ export async function deletePost(request: Request, response: Response) {
 		return response.status(404).json({ errorMessage: 'No post exists with the given id' });
 	}
 
+	const user = (await User.findById(request.userId)) as UserDoc;
+
 	// deleting the post doc from the database
 	await Post.findByIdAndDelete(id);
+
+	// removing the post id from the user's posts array
+	user.posts = user.posts.filter(postId => postId !== id);
+	await user.save();
 	response.status(204).end();
 }

@@ -11,7 +11,6 @@ import Button from '../Generic/Button';
 import FormWrapper from './FormWrapper';
 
 function Form() {
-	const [author, setAuthor] = useState('');
 	const [title, setTittle] = useState('');
 	const [description, setDescription] = useState('');
 	const [tags, setTags] = useState<string[]>([]);
@@ -19,6 +18,7 @@ function Form() {
 	const [selectedFile, setSelectedFile] = useState('');
 
 	const status = useSelector((state: RootState) => state.posts.status);
+	const token = useSelector((state: RootState) => state.auth.user!.token);
 	const currentPostId = useSelector((state: RootState) => state.posts.currentPostId);
 	const currentPost = useSelector((state: RootState) =>
 		state.posts.postItems.find(post => post._id === currentPostId)
@@ -30,7 +30,6 @@ function Form() {
 	useEffect(() => {
 		function populateFormFields() {
 			// I know for sure that when this function will be called, current post will exist
-			setAuthor(currentPost!.author);
 			setTittle(currentPost!.title);
 			setDescription(currentPost!.description);
 			setTags(currentPost!.tags);
@@ -49,7 +48,6 @@ function Form() {
 	}
 
 	function resetForm() {
-		setAuthor('');
 		setTittle('');
 		setDescription('');
 		setTags([]);
@@ -57,17 +55,17 @@ function Form() {
 
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		const canSubmit = [author, title, description, tags, selectedFile].every(Boolean);
+		const canSubmit = [title, description, tags, selectedFile].every(Boolean);
 		if (!canSubmit) return console.log('A required field is missing');
-		const post: BasePost = { author, title, description, tags, selectedFile };
+		const post: BasePost = { title, description, tags, selectedFile };
 		// need to update post if there is a current post id
 		if (currentPostId) {
-			dispatch(updatePost({ id: currentPostId, postData: post }));
+			dispatch(updatePost({ id: currentPostId, token, post }));
 			// clear current post id
 			dispatch(postsActions.clearCurrentPostId());
 		}
 		// else create new post
-		else dispatch(createPost(post));
+		else dispatch(createPost({ token, post }));
 		resetForm();
 	}
 	return (
@@ -76,15 +74,6 @@ function Form() {
 			handleSubmit={handleSubmit}
 			style={{ alignSelf: 'flex-start' }}
 		>
-			<Input
-				inputType="basic"
-				type="text"
-				name="author"
-				label="Author"
-				value={author}
-				setValue={setAuthor}
-			/>
-
 			<Input
 				inputType="basic"
 				type="text"

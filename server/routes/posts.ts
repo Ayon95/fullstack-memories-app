@@ -11,11 +11,11 @@ router.get('/', authorizeUser, getPosts);
 // setting up route handler for POST requests to the base route
 router.post('/', authorizeUser, createPost);
 
-// route handler for PUT request to a specific post route
-router.put('/:id', authorizeUser, updatePost);
+// route handler for PATCH request to a specific post route
+router.patch('/:id', authorizeUser, updatePost);
 
-// route handler for PUT request to update likes of a specific post
-router.put('/:id/likes', authorizeUser, updateLikes);
+// route handler for PATCH request to update likes of a specific post
+router.patch('/:id/likes', authorizeUser, updateLikes);
 
 // route handler for DELETE request to a specific post route
 router.delete('/:id', authorizeUser, deletePost);

@@ -33,7 +33,13 @@ export async function logIn(request: Request, response: Response) {
 
 		response
 			.status(200)
-			.json({ token, userId: user._id, firstName: user.firstName, lastName: user.lastName });
+			.json({
+				token,
+				userId: user._id,
+				firstName: user.firstName,
+				lastName: user.lastName,
+				posts: user.posts,
+			});
 	} catch {
 		response.status(500).json({ errorMessage: 'Internal server error' });
 	}
@@ -66,6 +72,7 @@ export async function signUp(request: Request, response: Response) {
 			userId: newUser._id,
 			firstName: newUser.firstName,
 			lastName: newUser.lastName,
+			posts: newUser.posts,
 		});
 	} catch {
 		response.status(500).json({ errorMessage: 'Internal server error' });

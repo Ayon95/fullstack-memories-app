@@ -9,10 +9,13 @@ Specified a few generic arguments because I need to use thunkAPI in the payload 
 - the second argument defines the type of the payload creator's first argument; not passing any argument, so it is void
 - the third argument is an object that defines types for thunkAPI properties;
 here we are specifying the type of the value passed into rejectWithValue() */
-export const fetchAllPosts = createAsyncThunk<Post[], void, { rejectValue: string }>(
+export const fetchAllPosts = createAsyncThunk<Post[], string, { rejectValue: string }>(
 	'posts/fetchAllPosts',
-	async (_, thunkAPI) => {
-		const response = await fetch(baseUrl);
+	async (token, thunkAPI) => {
+		const response = await fetch(baseUrl, {
+			method: 'GET',
+			headers: { Authorization: `Bearer ${token}` },
+		});
 		// handling unsuccessful requests
 		// the server will respond with an error object
 		if (!response.ok) {
@@ -27,36 +30,37 @@ export const fetchAllPosts = createAsyncThunk<Post[], void, { rejectValue: strin
 );
 
 // thunk creator responsible for sending a POST request to add a new post
-export const createPost = createAsyncThunk<Post, BasePost, { rejectValue: string }>(
-	'posts/createPost',
-	async (post, thunkAPI) => {
-		const response = await fetch(baseUrl, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(post),
-		});
+export const createPost = createAsyncThunk<
+	Post,
+	{ token: string; post: BasePost },
+	{ rejectValue: string }
+>('posts/createPost', async (requestData, thunkAPI) => {
+	const response = await fetch(baseUrl, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${requestData.token}` },
+		body: JSON.stringify(requestData.post),
+	});
 
-		if (!response.ok) {
-			const error = (await response.json()) as ErrorObj;
-			return thunkAPI.rejectWithValue(error.errorMessage);
-		}
-
-		const data = (await response.json()) as Post;
-		return data;
+	if (!response.ok) {
+		const error = (await response.json()) as ErrorObj;
+		return thunkAPI.rejectWithValue(error.errorMessage);
 	}
-);
+
+	const data = (await response.json()) as Post;
+	return data;
+});
 
 // thunk creator responsible for sending a PUT request to update an existing post
 // need both the id and the edited post data for this request
 export const updatePost = createAsyncThunk<
 	Post,
-	{ id: string; postData: BasePost },
+	{ token: string; id: string; post: BasePost },
 	{ rejectValue: string }
->('posts/updatePost', async (post, thunkAPI) => {
-	const response = await fetch(`${baseUrl}/${post.id}`, {
-		method: 'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(post.postData),
+>('posts/updatePost', async (requestData, thunkAPI) => {
+	const response = await fetch(`${baseUrl}/${requestData.id}`, {
+		method: 'PATCH',
+		headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${requestData.token}` },
+		body: JSON.stringify(requestData.post),
 	});
 
 	if (!response.ok) {
@@ -71,13 +75,16 @@ export const updatePost = createAsyncThunk<
 // thunk creator responsible for sending a PUT request to update the like count of a specific post
 export const updateLikes = createAsyncThunk<
 	Post,
-	{ id: string; likes: number },
+	{ id: string; token: string },
 	{ rejectValue: string }
->('posts/updateLikes', async (post, thunkAPI) => {
-	const response = await fetch(`${baseUrl}/${post.id}/likes`, {
-		method: 'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(post),
+>('posts/updateLikes', async (requestData, thunkAPI) => {
+	const response = await fetch(`${baseUrl}/${requestData.id}/likes`, {
+		method: 'PATCH',
+		headers: {
+			'Content-Type': 'application/json',
+			'Content-Length': '0',
+			Authorization: `Bearer ${requestData.token}`,
+		},
 	});
 
 	if (!response.ok) {
@@ -90,17 +97,21 @@ export const updateLikes = createAsyncThunk<
 });
 
 // thunk creator responsible for sending a DELETE request to delete a specific post
-export const deletePost = createAsyncThunk<string, string, { rejectValue: string }>(
-	'posts/deletePost',
-	async (id, thunkAPI) => {
-		const response = await fetch(`${baseUrl}/${id}`, { method: 'DELETE' });
+export const deletePost = createAsyncThunk<
+	string,
+	{ id: string; token: string },
+	{ rejectValue: string }
+>('posts/deletePost', async (requestData, thunkAPI) => {
+	const response = await fetch(`${baseUrl}/${requestData.id}`, {
+		method: 'DELETE',
+		headers: { Authorization: `Bearer ${requestData.token}` },
+	});
 
-		if (!response.ok) {
-			const error = (await response.json()) as ErrorObj;
-			return thunkAPI.rejectWithValue(error.errorMessage);
-		}
-
-		// return the id of the deleted post as payload because we will need it to remove that post from the postItems array
-		return id;
+	if (!response.ok) {
+		const error = (await response.json()) as ErrorObj;
+		return thunkAPI.rejectWithValue(error.errorMessage);
 	}
-);
+
+	// return the id of the deleted post as payload because we will need it to remove that post from the postItems array
+	return requestData.id;
+});

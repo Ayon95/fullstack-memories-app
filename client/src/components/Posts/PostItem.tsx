@@ -1,36 +1,59 @@
 import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
 import styled from 'styled-components';
-import { Post } from '../../utils/types';
+import { Post, User } from '../../utils/types';
 import { FaThumbsUp, FaTrashAlt, FaEdit, FaThumbsDown } from 'react-icons/fa';
 import stylesConfig from '../../utils/stylesConfig';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { postsActions } from '../../redux/slices/posts/postsSlice';
 import { useState } from 'react';
 import { deletePost, updateLikes } from './../../redux/slices/posts/postsThunks';
 import IconTextButton from '../Generic/IconTextButton';
+import { RootState } from '../../redux/store';
+import { useEffect } from 'react';
 
 type Props = { post: Post };
 
 function PostItem({ post }: Props) {
 	const [isLiked, setIsLiked] = useState(false);
 	const dispatch = useDispatch();
+	const currentUser = useSelector((state: RootState) => state.auth.user) as User;
+	const likeCount = post.likedBy.length;
 
-	function handleClickEdit(id: string) {
-		dispatch(postsActions.setCurrentPostId(id));
+	// check if the post is already liked by the current user
+	useEffect(() => {
+		if (post.likedBy.includes(currentUser.userId)) {
+			setIsLiked(true);
+		}
+	}, [currentUser, post]);
+
+	function handleClickEdit() {
+		dispatch(postsActions.setCurrentPostId(post._id));
 	}
 
-	function handleClickDelete(id: string) {
-		dispatch(deletePost(id));
+	function handleClickDelete() {
+		dispatch(deletePost({ id: post._id, token: currentUser.token }));
 	}
 
-	function handleClickLike(id: string) {
+	function handleClickLike() {
+		// this will send a PATCH request and the server will update the likes of the post
+		dispatch(updateLikes({ id: post._id, token: currentUser.token }));
+
 		// if the post is already liked, then unlike the post
 		// if the post is not liked, then like the post
-		if (isLiked) dispatch(updateLikes({ id, likes: post.likes - 1 }));
-		if (!isLiked) dispatch(updateLikes({ id, likes: post.likes + 1 }));
-
 		setIsLiked(prevState => !prevState);
+	}
+
+	function isUserOwnPost() {
+		return post.author._id === currentUser.userId;
+	}
+
+	function setPostAuthor() {
+		if (isUserOwnPost()) {
+			return 'You';
+		} else {
+			return `${post.author.firstName} ${post.author.lastName}`;
+		}
 	}
 	return (
 		<PostWrapper>
@@ -40,8 +63,9 @@ function PostItem({ post }: Props) {
 					<PostTags>{post.tags}</PostTags>
 					<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
 					<PostTitle>{post.title}</PostTitle>
+					<PostAuthor>Posted by: {setPostAuthor()}</PostAuthor>
 					<PostLikes>
-						{post.likes} {post.likes === 1 ? 'like' : 'likes'}
+						{likeCount} {likeCount === 1 ? 'like' : 'likes'}
 					</PostLikes>
 				</PostInfo>
 				<PostDescription>{post.description}</PostDescription>
@@ -51,22 +75,27 @@ function PostItem({ post }: Props) {
 					text={isLiked ? 'Unlike' : 'Like'}
 					icon={isLiked ? FaThumbsDown : FaThumbsUp}
 					color={stylesConfig.colorPrimary}
-					handleClick={() => handleClickLike(post._id)}
+					handleClick={handleClickLike}
 				/>
 
-				<IconTextButton
-					text="Edit"
-					icon={FaEdit}
-					color={stylesConfig.colorGrey3}
-					handleClick={() => handleClickEdit(post._id)}
-				/>
+				{/* the user can edit or delete only their own posts */}
+				{isUserOwnPost() && (
+					<>
+						<IconTextButton
+							text="Edit"
+							icon={FaEdit}
+							color={stylesConfig.colorGrey3}
+							handleClick={handleClickEdit}
+						/>
 
-				<IconTextButton
-					text="Delete"
-					icon={FaTrashAlt}
-					color={stylesConfig.colorSecondary}
-					handleClick={() => handleClickDelete(post._id)}
-				/>
+						<IconTextButton
+							text="Delete"
+							icon={FaTrashAlt}
+							color={stylesConfig.colorSecondary}
+							handleClick={handleClickDelete}
+						/>
+					</>
+				)}
 			</PostActions>
 		</PostWrapper>
 	);
@@ -112,6 +141,8 @@ const PostTitle = styled.h3`
 	font-size: 2.2rem;
 	margin: 0.5rem 0;
 `;
+
+const PostAuthor = styled.p``;
 
 const PostDate = styled.p``;
 

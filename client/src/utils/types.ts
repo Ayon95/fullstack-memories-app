@@ -4,6 +4,7 @@ export type User = {
 	token: string;
 	firstName: string;
 	lastName: string;
+	posts: string[];
 };
 
 // shape of request body that will be sent with POST request to sign up
@@ -24,7 +25,6 @@ export type AuthSliceState = {
 // shape of base post object
 export type BasePost = {
 	title: string;
-	author: string;
 	description: string;
 	tags: string[];
 	selectedFile: string;
@@ -33,7 +33,8 @@ export type BasePost = {
 // the final post object after being saved to the database
 export type Post = BasePost & {
 	_id: string;
-	likes: number;
+	author: { _id: string; firstName: string; lastName: string };
+	likedBy: string[];
 	// a Date object gets parsed to a string after parsing the JSON data sent by the server
 	// parse it back to a date object yourself wherever you are using it, e.g. in the PostItem component
 	createdAt: Date;
