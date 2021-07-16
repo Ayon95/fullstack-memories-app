@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 // extending the Request interface so that it may have the userId custom property
 declare module 'express-serve-static-core' {
 	export interface Request {
-		userId?: string;
+		user?: NativeUserDoc | GoogleUserDoc;
 	}
 }
 
@@ -38,15 +38,6 @@ export type UserSignupRequest = UserCredentials & {
 	firstName: string;
 	lastName: string;
 };
-
-// shape of User doc
-export interface UserDoc extends mongoose.Document {
-	firstName: string;
-	lastName: string;
-	email: string;
-	passwordHash: string;
-	posts: string[];
-}
 
 // shape of Base User doc
 export interface BaseUserDoc extends mongoose.Document {

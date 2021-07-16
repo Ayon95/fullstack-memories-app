@@ -4,7 +4,7 @@ import Button from '../Generic/Button';
 import FormWrapper from './FormWrapper';
 import Input from './Input';
 import { GoogleLogin, GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
-import { GoogleLoginFailedResponse, User } from '../../utils/types';
+import { GoogleLoginFailedResponse } from '../../utils/types';
 import { useDispatch } from 'react-redux';
 import { logIn, logInGoogle } from '../../redux/slices/auth/authThunks';
 import { useHistory } from 'react-router-dom';

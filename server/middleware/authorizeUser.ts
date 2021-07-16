@@ -16,11 +16,15 @@ Example:
 */
 
 import { NextFunction, Request, Response } from 'express';
+import { TokenPayload } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
+import GoogleUser from '../models/User/GoogleUser';
 import config from '../utils/config';
 // import { TokenPayload } from '../utils/types';
+import { googleOAuthClient } from './../index';
+import NativeUser from './../models/User/NativeUser';
 
-function authorizeUser(request: Request, response: Response, next: NextFunction) {
+async function authorizeUser(request: Request, response: Response, next: NextFunction) {
 	try {
 		// getting the value of the Authorization header
 		const authHeaderValue = request.get('Authorization');
@@ -38,27 +42,51 @@ function authorizeUser(request: Request, response: Response, next: NextFunction)
 
 		let decodedPayload: jwt.JwtPayload;
 
-		// verifying the token and getting its decoded payload if the token is our own
+		// verifying our server-generated token and getting its decoded payload
 		if (isCustomToken) {
 			// if the token is missing or is invalid, then a JsonWebTokenError will be thrown
 			// if the token is expired, then a TokenExpiredError will be thrown
 			decodedPayload = jwt.verify(token, config.JWT_SECRET) as jwt.JwtPayload;
-			// storing the user id in the request object by creating a 'userId' property on it
-			request.userId = decodedPayload.id;
+
+			// finding the native user
+			const nativeUser = await NativeUser.findById(decodedPayload.id);
+
+			if (!nativeUser) {
+				return response
+					.status(401)
+					.json({ errorMessage: 'The user needs to be logged-in to perform this action' });
+			}
+
+			// storing the user in the request object by creating a 'user' property on it
+			request.user = nativeUser;
 		}
 
 		// if the token is from Google Auth
 		if (!isCustomToken) {
-			// we won't need to verify the token with the secret in this case
-			decodedPayload = jwt.decode(token) as jwt.JwtPayload;
-			// sub is a unique id string that differentiates every Google user
-			request.userId = decodedPayload.sub!;
+			const loginTicket = await googleOAuthClient.verifyIdToken({
+				idToken: token,
+				audience: config.GOOGLE_OAUTH_CLIENT_ID,
+			});
+
+			const decodedPayload = loginTicket.getPayload() as TokenPayload;
+
+			// finding the google user
+			const googleUser = await GoogleUser.findOne({ googleId: decodedPayload.sub });
+
+			if (!googleUser) {
+				return response
+					.status(401)
+					.json({ errorMessage: 'The user needs to be logged-in to perform this action' });
+			}
+
+			request.user = googleUser;
 		}
 
 		// execute the next middleware
 		next();
 	} catch (error) {
 		console.error(error);
+		return response.status(401).json({ errorMessage: 'Invalid token provided' });
 	}
 }
 

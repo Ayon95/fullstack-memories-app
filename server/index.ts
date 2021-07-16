@@ -5,9 +5,13 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import postRoutes from './routes/posts';
 import userRoutes from './routes/user';
+import { OAuth2Client } from 'google-auth-library';
 
 // create an express app
 const app = express();
+
+// creating a google oauth client object
+export const googleOAuthClient = new OAuth2Client(config.GOOGLE_OAUTH_CLIENT_ID);
 
 // connect app to mongoose
 mongoose
