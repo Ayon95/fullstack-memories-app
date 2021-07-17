@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { getPostsBySearch } from '../../redux/slices/posts/postsThunks';
 import { RootState } from '../../redux/store';
 import Button from '../Generic/Button';
@@ -13,13 +14,17 @@ function SearchForm() {
 
 	const status = useSelector((state: RootState) => state.posts.status);
 	const dispatch = useDispatch();
+	const history = useHistory();
 
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		// if neither a title nor tags are provided then simply return
 		if (!title && tags.length === 0) return;
 
-		dispatch(getPostsBySearch({ searchTerm: title, tags }));
+		// dispatch(getPostsBySearch({ searchTerm: title, tags }));
+		// change the url so that it contains the specified query parameters
+		// this is important because the user will be able to share this page containing the exact filter parameters
+		history.push(`/home?searchTerm=${title || 'none'}&tags=${tags.join(',') || 'none'}`);
 	}
 	return (
 		<FormWrapper title="Search" handleSubmit={handleSubmit} style={{ marginBottom: '2rem' }}>

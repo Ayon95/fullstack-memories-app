@@ -32,15 +32,15 @@ export const fetchAllPosts = createAsyncThunk<Post[], string, { rejectValue: str
 // thunk creator responsible for sending a GET request to get posts based on the search query
 export const getPostsBySearch = createAsyncThunk<
 	Post[],
-	{ searchTerm: string; tags: string[] },
+	{ searchTerm: string; tags: string },
 	{ rejectValue: string }
 >('posts/getPostsBySearch', async (queryData, thunkAPI) => {
-	// converting the array of tags into a string where tags are separated by ,
-	const tagsString = queryData.tags.join(',');
 	// specifying two query parameters -> searchTerm and tags
 	const response = await fetch(
 		// the url will look something like -> http://localhost:5000/posts/search?searchTerm=niagara&tags=niagara,canada,usa
-		`${baseUrl}/search?searchTerm=${queryData.searchTerm || 'none'}&tags=${tagsString}`
+		`${baseUrl}/search?searchTerm=${queryData.searchTerm || 'none'}&tags=${
+			queryData.tags || 'none'
+		}`
 	);
 
 	if (!response.ok) {
@@ -49,7 +49,6 @@ export const getPostsBySearch = createAsyncThunk<
 	}
 
 	const data = (await response.json()) as Post[];
-	console.log(data);
 	return data;
 });
 
