@@ -2,7 +2,7 @@ import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
 import styled from 'styled-components';
 import { Post, User } from '../../utils/types';
-import { FaThumbsUp, FaTrashAlt, FaEdit, FaThumbsDown } from 'react-icons/fa';
+import { FaTrashAlt, FaEdit, FaThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import stylesConfig from '../../utils/stylesConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import { postsActions } from '../../redux/slices/posts/postsSlice';
@@ -63,7 +63,9 @@ function PostItem({ post }: Props) {
 					<PostTags>{post.tags}</PostTags>
 					<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
 					<PostTitle>{post.title}</PostTitle>
-					<PostAuthor>Posted by: {setPostAuthor()}</PostAuthor>
+					<PostAuthor>
+						By: <span style={{ fontWeight: 'bold' }}>{setPostAuthor()}</span>
+					</PostAuthor>
 					<PostLikes>
 						{likeCount} {likeCount === 1 ? 'like' : 'likes'}
 					</PostLikes>
@@ -73,7 +75,7 @@ function PostItem({ post }: Props) {
 			<PostActions>
 				<IconTextButton
 					text={isLiked ? 'Unlike' : 'Like'}
-					icon={isLiked ? FaThumbsDown : FaThumbsUp}
+					icon={isLiked ? FaThumbsDown : FaRegThumbsUp}
 					color={stylesConfig.colorPrimary}
 					handleClick={handleClickLike}
 				/>
@@ -148,7 +150,9 @@ const PostDate = styled.p``;
 
 const PostLikes = styled.p``;
 
-const PostDescription = styled.p``;
+const PostDescription = styled.p`
+	line-height: 1.5;
+`;
 
 const PostActions = styled.div`
 	display: flex;

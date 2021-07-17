@@ -21,6 +21,10 @@ const GlobalStyles = createGlobalStyle`
         padding: 2rem;
     }
 
+    h1, h2, h3 {
+        color: ${stylesConfig.colorPrimary};
+    }
+
     .btn {
         text-transform: uppercase;
         border-radius: 4px;

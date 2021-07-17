@@ -46,10 +46,12 @@ const FormControl = styled.div`
 const Label = styled.label`
 	display: block;
 	margin-bottom: 4px;
+	font-weight: bold;
 `;
 
 // generic input styles
 const inputStyles = css`
+	font-size: 1.6rem;
 	width: 100%;
 	padding: 1rem;
 	outline: none;
