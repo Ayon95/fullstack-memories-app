@@ -1,5 +1,12 @@
 import express from 'express';
-import { createPost, deletePost, getPosts, updateLikes, updatePost } from '../controllers/posts';
+import {
+	createPost,
+	deletePost,
+	getPosts,
+	getPostsBySearch,
+	updateLikes,
+	updatePost,
+} from '../controllers/posts';
 import authorizeUser from '../middleware/authorizeUser';
 
 // creating an express router
@@ -8,7 +15,10 @@ const router = express.Router();
 // setting up route handler for GET requests to the base route
 router.get('/', authorizeUser, getPosts);
 
-// setting up route handler for POST requests to the base route
+// route handler for GET requests to get posts based on search query params
+router.get('/search', getPostsBySearch);
+
+// route handler for POST requests to the base route
 router.post('/', authorizeUser, createPost);
 
 // route handler for PATCH request to a specific post route

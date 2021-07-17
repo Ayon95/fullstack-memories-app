@@ -13,7 +13,7 @@ import FormWrapper from './FormWrapper';
 function Form() {
 	const [title, setTittle] = useState('');
 	const [description, setDescription] = useState('');
-	const [tags, setTags] = useState<string[]>([]);
+	const [tags, setTags] = useState('');
 	// the image file will be converted to a base-64 string
 	const [selectedFile, setSelectedFile] = useState('');
 
@@ -32,7 +32,7 @@ function Form() {
 			// I know for sure that when this function will be called, current post will exist
 			setTittle(currentPost!.title);
 			setDescription(currentPost!.description);
-			setTags(currentPost!.tags);
+			setTags(currentPost!.tags.join(','));
 			setSelectedFile(currentPost!.selectedFile);
 		}
 		if (currentPost) {
@@ -50,14 +50,14 @@ function Form() {
 	function resetForm() {
 		setTittle('');
 		setDescription('');
-		setTags([]);
+		setTags('');
 	}
 
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		const canSubmit = [title, description, tags, selectedFile].every(Boolean);
 		if (!canSubmit) return console.log('A required field is missing');
-		const post: BasePost = { title, description, tags, selectedFile };
+		const post: BasePost = { title, description, selectedFile, tags: tags.split(',') };
 		// need to update post if there is a current post id
 		if (currentPostId) {
 			dispatch(updatePost({ id: currentPostId, token, post }));

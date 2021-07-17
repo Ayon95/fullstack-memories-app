@@ -60,7 +60,7 @@ function PostItem({ post }: Props) {
 			<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
 			<PostContent>
 				<PostInfo>
-					<PostTags>{post.tags}</PostTags>
+					<PostTags>#{post.tags.join(' #')}</PostTags>
 					<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
 					<PostTitle>{post.title}</PostTitle>
 					<PostAuthor>

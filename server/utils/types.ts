@@ -57,3 +57,9 @@ export interface NativeUserDoc extends BaseUserDoc {
 export interface GoogleUserDoc extends BaseUserDoc {
 	googleId: string;
 }
+
+// shape of search query object
+export type SearchQuery = {
+	searchTerm: string;
+	tags: string;
+};

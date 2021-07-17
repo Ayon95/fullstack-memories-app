@@ -1,8 +1,9 @@
 // This file contains all the handlers for post-related routes
 
 import { Request, Response } from 'express';
+import { ParamsDictionary } from 'express-serve-static-core';
 import Post from '../models/Post';
-import { BasePost, PostDoc } from '../utils/types';
+import { BasePost, PostDoc, SearchQuery } from '../utils/types';
 
 export async function getPosts(request: Request, response: Response) {
 	try {
@@ -13,6 +14,31 @@ export async function getPosts(request: Request, response: Response) {
 	} catch (error) {
 		console.log(error);
 		response.status(404).json({ errorMessage: 'The requested url does not exist' });
+	}
+}
+
+export async function getPostsBySearch(
+	request: Request<ParamsDictionary, any, any, SearchQuery>,
+	response: Response
+) {
+	try {
+		// getting the query params
+		const { searchTerm, tags } = request.query;
+		// converting the searchTerm to a regex, and making it case-insensitive
+		// since it is a regex, mongoose will simply check whether the title field value matches this regex
+		const title = new RegExp(searchTerm, 'i');
+		// converting the tags string into an array
+		const tagsArray = tags.split(',');
+		// getting the posts where either their title matches the search term
+		// or one of their tags is present in the list of tags that were passed
+		// if both search term and tags are specified, then all posts satisfying any of the two conditions will be selected
+		const posts = await Post.find({
+			$or: [{ title: title }, { tags: { $in: tagsArray } }],
+		}).populate('author', { _id: 1, firstName: 1, lastName: 1 });
+
+		response.json(posts);
+	} catch (error) {
+		response.status(404).json({ errorMessage: error.message });
 	}
 }
 
@@ -29,7 +55,7 @@ export async function createPost(request: Request, response: Response) {
 
 		// creating a new post doc
 		const newPost = await Post.create({
-			...request.body,
+			...post,
 			author: user._id,
 			likedBy: [],
 			createdAt: new Date(),

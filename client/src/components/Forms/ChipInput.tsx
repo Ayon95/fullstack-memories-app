@@ -22,6 +22,8 @@ function ChipInput({ name, label, chips, setChips }: Props) {
 	}
 
 	function handlePressEnter(e: React.KeyboardEvent<HTMLInputElement>) {
+		// don't submit the form if the user presses 'Enter'
+		if (e.key === 'Enter') e.preventDefault();
 		// return if the user pressed a key that is not 'Enter', or the user hasn't typed anything
 		if (e.key !== 'Enter' || !text) return;
 		// need to show error if the user tries to add the same input more than once
