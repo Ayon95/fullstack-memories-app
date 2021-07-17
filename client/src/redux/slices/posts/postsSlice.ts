@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Post, PostsSliceState } from '../../../utils/types';
 import { isPendingAction, isRejectedAction, isUpdateFulfilledAction } from '../../matchers';
-import { createPost, deletePost, fetchAllPosts } from './postsThunks';
+import { createPost, deletePost, fetchAllPosts, getPostsBySearch } from './postsThunks';
 
 const initialState: PostsSliceState = {
 	postItems: [],
@@ -24,6 +24,11 @@ const postsSlice = createSlice({
 	},
 	extraReducers: builder => {
 		builder.addCase(fetchAllPosts.fulfilled, (state, action) => {
+			state.status = 'success';
+			state.postItems = action.payload;
+		});
+
+		builder.addCase(getPostsBySearch.fulfilled, (state, action) => {
 			state.status = 'success';
 			state.postItems = action.payload;
 		});

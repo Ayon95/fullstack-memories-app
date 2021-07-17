@@ -15,9 +15,9 @@ function ChipInput({ name, label, chips, setChips }: Props) {
 	const [text, setText] = useState('');
 	const [validationError, setValidationError] = useState('');
 
-	function removeChip(text: string) {
+	function removeChip(chipToRemove: string) {
 		// filtering out the chip whose 'x' icon was clicked
-		const updatedChips = chips.filter(chipText => chipText !== text);
+		const updatedChips = chips.filter(chip => chip !== chipToRemove);
 		setChips(updatedChips);
 	}
 
@@ -40,10 +40,10 @@ function ChipInput({ name, label, chips, setChips }: Props) {
 			<label htmlFor={name}>{label}</label>
 			<InputContainer>
 				<Chips>
-					{chips.map(chipText => (
-						<Chip key={chipText}>
-							<ChipText>{chipText}</ChipText>
-							<DeleteIcon onClick={() => removeChip(chipText)} tabIndex={0} />
+					{chips.map(chip => (
+						<Chip key={chip}>
+							<ChipText>{chip}</ChipText>
+							<DeleteIcon onClick={() => removeChip(chip)} tabIndex={0} />
 						</Chip>
 					))}
 				</Chips>

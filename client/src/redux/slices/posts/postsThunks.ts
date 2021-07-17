@@ -29,6 +29,30 @@ export const fetchAllPosts = createAsyncThunk<Post[], string, { rejectValue: str
 	}
 );
 
+// thunk creator responsible for sending a GET request to get posts based on the search query
+export const getPostsBySearch = createAsyncThunk<
+	Post[],
+	{ searchTerm: string; tags: string[] },
+	{ rejectValue: string }
+>('posts/getPostsBySearch', async (queryData, thunkAPI) => {
+	// converting the array of tags into a string where tags are separated by ,
+	const serializedTags = queryData.tags.join(',');
+	console.log(serializedTags);
+	// specifying two query parameters -> searchTerm and tags
+	const response = await fetch(
+		// the url will look something like -> http://localhost:5000/posts/search?searchTerm=niagara&tags=niagara,canada,usa
+		`${baseUrl}/search?searchTerm=${queryData.searchTerm || 'none'}&tags=${serializedTags}`
+	);
+
+	if (!response.ok) {
+		const error = (await response.json()) as ErrorObj;
+		return thunkAPI.rejectWithValue(error.errorMessage);
+	}
+
+	const data = (await response.json()) as Post[];
+	return data;
+});
+
 // thunk creator responsible for sending a POST request to add a new post
 export const createPost = createAsyncThunk<
 	Post,
