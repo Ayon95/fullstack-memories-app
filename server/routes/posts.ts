@@ -16,7 +16,7 @@ const router = express.Router();
 router.get('/', authorizeUser, getPosts);
 
 // route handler for GET requests to get posts based on search query params
-router.get('/search', getPostsBySearch);
+router.get('/search', authorizeUser, getPostsBySearch);
 
 // route handler for POST requests to the base route
 router.post('/', authorizeUser, createPost);

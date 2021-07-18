@@ -38,20 +38,30 @@ export async function getPostsBySearch(
 ) {
 	try {
 		// getting the query params
-		const { searchTerm, tags } = request.query;
+		const { page, searchTerm, tags } = request.query;
+		const limit = 6;
+		const startIndex = (Number.parseFloat(page) - 1) * limit;
 		// converting the searchTerm to a regex, and making it case-insensitive
 		// since it is a regex, mongoose will simply check whether the title field value matches this regex
 		const title = new RegExp(searchTerm, 'i');
 		// converting the tags string into an array
 		const tagsArray = tags.split(',');
+		// getting the total number of search results
+		const total = await Post.countDocuments({
+			$or: [{ title: title }, { tags: { $in: tagsArray } }],
+		});
 		// getting the posts where either their title matches the search term
 		// or one of their tags is present in the list of tags that were passed
 		// if both search term and tags are specified, then all posts satisfying any of the two conditions will be selected
 		const posts = await Post.find({
 			$or: [{ title: title }, { tags: { $in: tagsArray } }],
-		}).populate('author', { _id: 1, firstName: 1, lastName: 1 });
+		})
+			.skip(startIndex)
+			.limit(limit)
+			.sort({ _id: -1 })
+			.populate('author', { _id: 1, firstName: 1, lastName: 1 });
 
-		response.json(posts);
+		response.json({ posts, totalNumPages: Math.ceil(total / limit) });
 	} catch (error) {
 		response.status(404).json({ errorMessage: error.message });
 	}

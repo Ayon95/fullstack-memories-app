@@ -62,4 +62,5 @@ export interface GoogleUserDoc extends BaseUserDoc {
 export type SearchQuery = {
 	searchTerm: string;
 	tags: string;
+	page: string;
 };

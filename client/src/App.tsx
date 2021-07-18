@@ -35,7 +35,8 @@ function App() {
 						<Welcome />
 					</Route>
 
-					<ProtectedRoute path="/home" component={Home} />
+					<ProtectedRoute exact={true} path="/home" component={Home} />
+					<ProtectedRoute path="/home/search" component={Home} />
 				</Switch>
 			</Router>
 		</>

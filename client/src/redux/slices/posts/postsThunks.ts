@@ -33,15 +33,19 @@ export const getPosts = createAsyncThunk<
 // thunk creator responsible for sending a GET request to get posts based on the search query
 export const getPostsBySearch = createAsyncThunk<
 	GetPostsResponse,
-	{ searchTerm: string; tags: string },
+	{ token: string; page: string; searchTerm: string; tags: string },
 	{ rejectValue: string }
->('posts/getPostsBySearch', async (queryData, thunkAPI) => {
+>('posts/getPostsBySearch', async (requestData, thunkAPI) => {
 	// specifying two query parameters -> searchTerm and tags
 	const response = await fetch(
 		// the url will look something like -> http://localhost:5000/posts/search?searchTerm=niagara&tags=niagara,canada,usa
-		`${baseUrl}/search?searchTerm=${queryData.searchTerm || 'none'}&tags=${
-			queryData.tags || 'none'
-		}`
+		`${baseUrl}/search?page=${requestData.page}&searchTerm=${
+			requestData.searchTerm || 'none'
+		}&tags=${requestData.tags || 'none'}`,
+		{
+			method: 'GET',
+			headers: { Authorization: `Bearer ${requestData.token}` },
+		}
 	);
 
 	if (!response.ok) {
