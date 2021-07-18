@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route, useHistory } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import GlobalStyles from './style/globalStyles';
 import Home from './pages/Home';
 import Welcome from './pages/Welcome';
@@ -11,7 +11,6 @@ import { checkExpiredToken, getUserFromLocalStorage } from './utils/helpers';
 
 function App() {
 	const dispatch = useDispatch();
-	const history = useHistory();
 
 	useEffect(() => {
 		const user = getUserFromLocalStorage();
@@ -25,7 +24,7 @@ function App() {
 		}
 		// dispatching action to set user in redux store if user exists
 		dispatch(authActions.setUser(user));
-	}, [dispatch, history]);
+	}, [dispatch]);
 
 	return (
 		<>

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { BasePost, ErrorObj, Post } from '../../../utils/types';
+import { BasePost, ErrorObj, Post, QueryParams } from '../../../utils/types';
 
 const baseUrl = 'http://localhost:5000/posts';
 
@@ -30,27 +30,26 @@ export const fetchAllPosts = createAsyncThunk<Post[], string, { rejectValue: str
 );
 
 // thunk creator responsible for sending a GET request to get posts based on the search query
-export const getPostsBySearch = createAsyncThunk<
-	Post[],
-	{ searchTerm: string; tags: string },
-	{ rejectValue: string }
->('posts/getPostsBySearch', async (queryData, thunkAPI) => {
-	// specifying two query parameters -> searchTerm and tags
-	const response = await fetch(
-		// the url will look something like -> http://localhost:5000/posts/search?searchTerm=niagara&tags=niagara,canada,usa
-		`${baseUrl}/search?searchTerm=${queryData.searchTerm || 'none'}&tags=${
-			queryData.tags || 'none'
-		}`
-	);
+export const getPostsBySearch = createAsyncThunk<Post[], QueryParams, { rejectValue: string }>(
+	'posts/getPostsBySearch',
+	async (queryData, thunkAPI) => {
+		// specifying two query parameters -> searchTerm and tags
+		const response = await fetch(
+			// the url will look something like -> http://localhost:5000/posts/search?searchTerm=niagara&tags=niagara,canada,usa
+			`${baseUrl}/search?searchTerm=${queryData.searchTerm || 'none'}&tags=${
+				queryData.tags || 'none'
+			}`
+		);
 
-	if (!response.ok) {
-		const error = (await response.json()) as ErrorObj;
-		return thunkAPI.rejectWithValue(error.errorMessage);
+		if (!response.ok) {
+			const error = (await response.json()) as ErrorObj;
+			return thunkAPI.rejectWithValue(error.errorMessage);
+		}
+
+		const data = (await response.json()) as Post[];
+		return data;
 	}
-
-	const data = (await response.json()) as Post[];
-	return data;
-});
+);
 
 // thunk creator responsible for sending a POST request to add a new post
 export const createPost = createAsyncThunk<

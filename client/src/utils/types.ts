@@ -40,12 +40,19 @@ export type Post = BasePost & {
 	createdAt: Date;
 };
 
+// shape of query params object
+export type QueryParams = {
+	searchTerm: string;
+	tags: string;
+};
+
 // shape of posts state
 export type PostsSliceState = {
 	postItems: Post[];
 	status: 'idle' | 'pending' | 'success' | 'failure';
 	error: string;
 	currentPostId: string;
+	queryParams: QueryParams;
 };
 
 // shape of error object sent as response by the server

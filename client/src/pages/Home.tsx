@@ -15,7 +15,6 @@ function Home() {
 	const location = useLocation();
 
 	useEffect(() => {
-		console.log(location);
 		// if there are no query params, then fetch all the posts
 		if (!location.search) {
 			dispatch(fetchAllPosts(token));

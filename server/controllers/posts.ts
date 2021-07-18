@@ -5,12 +5,27 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import Post from '../models/Post';
 import { BasePost, PostDoc, SearchQuery } from '../utils/types';
 
-export async function getPosts(request: Request, response: Response) {
+export async function getPosts(
+	request: Request<ParamsDictionary, any, any, { page: string }>,
+	response: Response
+) {
+	const page = Number.parseFloat(request.query.page);
+	// want to have 6 posts per page
+	const limit = 6;
+	// the index of the very first item of the page
+	const startIndex = (page - 1) * limit;
 	try {
-		// getting all the posts from the posts collection
+		// getting the count of all posts
+		const total = await Post.countDocuments({});
+		// getting a specific number of posts starting from the start index (we don't want to get posts from previous pages)
+		// sorting the posts from newest to oldest
 		// also populating the author field of each post with _id, firstName, and lastName
-		const posts = await Post.find().populate('author', { _id: 1, firstName: 1, lastName: 1 });
-		response.json(posts);
+		const posts = await Post.find({})
+			.skip(startIndex)
+			.limit(limit)
+			.sort({ createdAt: -1 })
+			.populate('author', { _id: 1, firstName: 1, lastName: 1 });
+		response.json({ posts, currentPage: page, totalNumPages: Math.ceil(total / limit) });
 	} catch (error) {
 		console.log(error);
 		response.status(404).json({ errorMessage: 'The requested url does not exist' });

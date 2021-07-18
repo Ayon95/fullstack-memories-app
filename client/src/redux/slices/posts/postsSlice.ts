@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Post, PostsSliceState } from '../../../utils/types';
+import { Post, PostsSliceState, QueryParams } from '../../../utils/types';
 import { isPendingAction, isRejectedAction, isUpdateFulfilledAction } from '../../matchers';
 import { createPost, deletePost, fetchAllPosts, getPostsBySearch } from './postsThunks';
 
@@ -8,6 +8,7 @@ const initialState: PostsSliceState = {
 	status: 'idle',
 	error: '',
 	currentPostId: '',
+	queryParams: { searchTerm: '', tags: '' },
 };
 
 const postsSlice = createSlice({
@@ -20,6 +21,10 @@ const postsSlice = createSlice({
 
 		clearCurrentPostId: state => {
 			state.currentPostId = '';
+		},
+
+		setQueryParams: (state, action: PayloadAction<QueryParams>) => {
+			state.queryParams = action.payload;
 		},
 	},
 	extraReducers: builder => {

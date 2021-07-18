@@ -19,11 +19,8 @@ function SearchForm() {
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		// if neither a title nor tags are provided then simply return
-		if (!title && tags.length === 0) return;
-
-		// dispatch(getPostsBySearch({ searchTerm: title, tags }));
+		if (!title && tags.length === 0) return history.push('/home');
 		// change the url so that it contains the specified query parameters
-		// this is important because the user will be able to share this page containing the exact filter parameters
 		history.push(`/home?searchTerm=${title || 'none'}&tags=${tags.join(',') || 'none'}`);
 	}
 	return (
