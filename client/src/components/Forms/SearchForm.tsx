@@ -20,11 +20,12 @@ function SearchForm() {
 		e.preventDefault();
 		// if neither a title nor tags are provided then simply return
 		if (!title && tags.length === 0) return history.push('/home');
+		dispatch(getPostsBySearch({ searchTerm: title, tags: tags.join(',') }));
 		// change the url so that it contains the specified query parameters
 		history.push(`/home?searchTerm=${title || 'none'}&tags=${tags.join(',') || 'none'}`);
 	}
 	return (
-		<FormWrapper title="Search" handleSubmit={handleSubmit} style={{ marginBottom: '2rem' }}>
+		<FormWrapper title="Search" handleSubmit={handleSubmit}>
 			<Input
 				inputType="basic"
 				type="text"

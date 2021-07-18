@@ -3,30 +3,27 @@ import styled from 'styled-components';
 import Posts from '../components/Posts/Posts';
 import PostForm from '../components/Forms/PostForm';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllPosts, getPostsBySearch } from '../redux/slices/posts/postsThunks';
+import { getPosts, getPostsBySearch } from '../redux/slices/posts/postsThunks';
 import Layout from '../components/Layout/Layout';
 import { RootState } from '../redux/store';
 import SearchForm from '../components/Forms/SearchForm';
 import { useLocation } from 'react-router-dom';
+import Pagination from '../components/Pagination/Pagination';
 
 function Home() {
 	const dispatch = useDispatch();
 	const token = useSelector((state: RootState) => state.auth.user!.token);
+	const currentPage = useSelector((state: RootState) => state.posts.currentPage);
 	const location = useLocation();
 
+	// // wrapping the query string with the URLSearchParams API
+	// const query = new URLSearchParams(location.search);
+	// // getting the value of page from query string
+	// const page = query.get('page');
+
 	useEffect(() => {
-		// if there are no query params, then fetch all the posts
-		if (!location.search) {
-			dispatch(fetchAllPosts(token));
-			return;
-		}
-		// wrapping the query string with the URLSearchParams API
-		const query = new URLSearchParams(location.search);
-		// getting the search term and tags from the query string (there will be at least one)
-		const searchTerm = query.get('searchTerm') || '';
-		const tags = query.get('tags') || '';
-		dispatch(getPostsBySearch({ searchTerm, tags }));
-	}, [dispatch, token, location]);
+		dispatch(getPosts({ token, page: currentPage.toString() }));
+	}, [dispatch, token, currentPage]);
 	return (
 		<Layout>
 			<HomeContainer>
@@ -34,6 +31,7 @@ function Home() {
 				<FormsContainer>
 					<SearchForm />
 					<PostForm />
+					<Pagination />
 				</FormsContainer>
 			</HomeContainer>
 		</Layout>

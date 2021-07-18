@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { BasePost, ErrorObj, Post, QueryParams } from '../../../utils/types';
+import { BasePost, ErrorObj, GetPostsResponse, Post } from '../../../utils/types';
 
 const baseUrl = 'http://localhost:5000/posts';
 
@@ -9,47 +9,49 @@ Specified a few generic arguments because I need to use thunkAPI in the payload 
 - the second argument defines the type of the payload creator's first argument; not passing any argument, so it is void
 - the third argument is an object that defines types for thunkAPI properties;
 here we are specifying the type of the value passed into rejectWithValue() */
-export const fetchAllPosts = createAsyncThunk<Post[], string, { rejectValue: string }>(
-	'posts/fetchAllPosts',
-	async (token, thunkAPI) => {
-		const response = await fetch(baseUrl, {
-			method: 'GET',
-			headers: { Authorization: `Bearer ${token}` },
-		});
-		// handling unsuccessful requests
-		// the server will respond with an error object
-		if (!response.ok) {
-			const error = (await response.json()) as ErrorObj;
-			return thunkAPI.rejectWithValue(error.errorMessage);
-		}
-		// the request was successful
-		// using type assertion to tell TS that the response data will be an array of Post objects
-		const data = (await response.json()) as Post[];
-		return data;
+export const getPosts = createAsyncThunk<
+	GetPostsResponse,
+	{ token: string; page: string },
+	{ rejectValue: string }
+>('posts/getPosts', async (requestData, thunkAPI) => {
+	const response = await fetch(`${baseUrl}?page=${requestData.page}`, {
+		method: 'GET',
+		headers: { Authorization: `Bearer ${requestData.token}` },
+	});
+	// handling unsuccessful requests
+	// the server will respond with an error object
+	if (!response.ok) {
+		const error = (await response.json()) as ErrorObj;
+		return thunkAPI.rejectWithValue(error.errorMessage);
 	}
-);
+	// the request was successful
+	// using type assertion to tell TS that the response data will be an array of Post objects
+	const data = (await response.json()) as GetPostsResponse;
+	return data;
+});
 
 // thunk creator responsible for sending a GET request to get posts based on the search query
-export const getPostsBySearch = createAsyncThunk<Post[], QueryParams, { rejectValue: string }>(
-	'posts/getPostsBySearch',
-	async (queryData, thunkAPI) => {
-		// specifying two query parameters -> searchTerm and tags
-		const response = await fetch(
-			// the url will look something like -> http://localhost:5000/posts/search?searchTerm=niagara&tags=niagara,canada,usa
-			`${baseUrl}/search?searchTerm=${queryData.searchTerm || 'none'}&tags=${
-				queryData.tags || 'none'
-			}`
-		);
+export const getPostsBySearch = createAsyncThunk<
+	GetPostsResponse,
+	{ searchTerm: string; tags: string },
+	{ rejectValue: string }
+>('posts/getPostsBySearch', async (queryData, thunkAPI) => {
+	// specifying two query parameters -> searchTerm and tags
+	const response = await fetch(
+		// the url will look something like -> http://localhost:5000/posts/search?searchTerm=niagara&tags=niagara,canada,usa
+		`${baseUrl}/search?searchTerm=${queryData.searchTerm || 'none'}&tags=${
+			queryData.tags || 'none'
+		}`
+	);
 
-		if (!response.ok) {
-			const error = (await response.json()) as ErrorObj;
-			return thunkAPI.rejectWithValue(error.errorMessage);
-		}
-
-		const data = (await response.json()) as Post[];
-		return data;
+	if (!response.ok) {
+		const error = (await response.json()) as ErrorObj;
+		return thunkAPI.rejectWithValue(error.errorMessage);
 	}
-);
+
+	const data = (await response.json()) as GetPostsResponse;
+	return data;
+});
 
 // thunk creator responsible for sending a POST request to add a new post
 export const createPost = createAsyncThunk<

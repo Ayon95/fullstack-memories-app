@@ -72,7 +72,7 @@ function Form() {
 		<FormWrapper
 			title={currentPostId ? 'Edit A Memory' : 'Add A Memory'}
 			handleSubmit={handleSubmit}
-			style={{ alignSelf: 'flex-start' }}
+			style={{ alignSelf: 'flex-start', margin: '2rem 0' }}
 		>
 			<Input
 				inputType="basic"

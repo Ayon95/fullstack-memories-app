@@ -1,5 +1,6 @@
 const stylesConfig = {
 	shadowNormal: 'rgba(0, 0, 0, 0.35) 0px 5px 15px;',
+	shadowThin: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',
 
 	colorPrimary: 'hsl(217, 84%, 39%)',
 	colorPrimaryLight1: 'hsl(217, 84%, 43%)',

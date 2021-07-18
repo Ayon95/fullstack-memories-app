@@ -24,7 +24,7 @@ const FormComponent = styled.form`
 	padding: 2rem;
 	border-radius: 4px;
 	box-shadow: ${stylesConfig.shadowNormal};
-	width: 38rem;
+	/* width: 38rem; */
 `;
 
 const FormTitle = styled.h3`

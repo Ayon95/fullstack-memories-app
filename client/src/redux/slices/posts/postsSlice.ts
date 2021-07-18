@@ -1,14 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Post, PostsSliceState, QueryParams } from '../../../utils/types';
+import { Post, PostsSliceState } from '../../../utils/types';
 import { isPendingAction, isRejectedAction, isUpdateFulfilledAction } from '../../matchers';
-import { createPost, deletePost, fetchAllPosts, getPostsBySearch } from './postsThunks';
+import { createPost, deletePost, getPosts, getPostsBySearch } from './postsThunks';
 
 const initialState: PostsSliceState = {
 	postItems: [],
 	status: 'idle',
 	error: '',
 	currentPostId: '',
-	queryParams: { searchTerm: '', tags: '' },
+	currentPage: 1,
+	totalNumPages: 1,
 };
 
 const postsSlice = createSlice({
@@ -23,19 +24,21 @@ const postsSlice = createSlice({
 			state.currentPostId = '';
 		},
 
-		setQueryParams: (state, action: PayloadAction<QueryParams>) => {
-			state.queryParams = action.payload;
+		setCurrentPage: (state, action: PayloadAction<number>) => {
+			state.currentPage = action.payload;
 		},
 	},
 	extraReducers: builder => {
-		builder.addCase(fetchAllPosts.fulfilled, (state, action) => {
+		builder.addCase(getPosts.fulfilled, (state, action) => {
 			state.status = 'success';
-			state.postItems = action.payload;
+			state.postItems = action.payload.posts;
+			state.totalNumPages = action.payload.totalNumPages;
 		});
 
 		builder.addCase(getPostsBySearch.fulfilled, (state, action) => {
 			state.status = 'success';
-			state.postItems = action.payload;
+			state.postItems = action.payload.posts;
+			state.totalNumPages = action.payload.totalNumPages;
 		});
 
 		builder.addCase(createPost.fulfilled, (state, action) => {

@@ -23,9 +23,9 @@ export async function getPosts(
 		const posts = await Post.find({})
 			.skip(startIndex)
 			.limit(limit)
-			.sort({ createdAt: -1 })
+			.sort({ _id: -1 })
 			.populate('author', { _id: 1, firstName: 1, lastName: 1 });
-		response.json({ posts, currentPage: page, totalNumPages: Math.ceil(total / limit) });
+		response.json({ posts, totalNumPages: Math.ceil(total / limit) });
 	} catch (error) {
 		console.log(error);
 		response.status(404).json({ errorMessage: 'The requested url does not exist' });

@@ -45,7 +45,7 @@ function LoginForm() {
 		console.log('Failed to log in with Google', response.error);
 	}
 	return (
-		<FormWrapper title="Log In" handleSubmit={handleSubmit}>
+		<FormWrapper title="Log In" handleSubmit={handleSubmit} style={{ width: '38rem' }}>
 			<Input
 				inputType="basic"
 				type="email"
