@@ -16,7 +16,7 @@ function Welcome() {
 	const history = useHistory();
 	const currentUser = useSelector((state: RootState) => state.auth.user);
 
-	// if the logged-in user tries to go to the Welcome page by changing the url, then redirect the user to Home page
+	// redirect the logged-in user (if any) to the home page
 	useEffect(() => {
 		if (currentUser) history.push('/home');
 	}, [currentUser, history]);

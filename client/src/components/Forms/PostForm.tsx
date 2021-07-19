@@ -91,7 +91,14 @@ function Form() {
 				setValue={setDescription}
 			/>
 
-			<Input inputType="basic" name="tags" label="Tags" value={tags} setValue={setTags} />
+			<Input
+				inputType="basic"
+				name="tags"
+				label="Tags"
+				value={tags}
+				setValue={setTags}
+				placeholder="e.g. outdoors,nature,fun"
+			/>
 			<input
 				className="input--file"
 				type="file"

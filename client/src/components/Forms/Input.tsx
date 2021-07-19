@@ -7,6 +7,7 @@ type Props = {
 	type?: 'text' | 'email' | 'password';
 	name: string;
 	label: string;
+	placeholder?: string;
 	value: string | string[];
 	setValue: React.Dispatch<React.SetStateAction<any>>;
 };
@@ -21,6 +22,7 @@ function Input(props: Props) {
 					id={props.name}
 					value={props.value}
 					onChange={e => props.setValue(e.target.value)}
+					placeholder={props.placeholder}
 				/>
 			)}
 			{props.inputType === 'textarea' && (

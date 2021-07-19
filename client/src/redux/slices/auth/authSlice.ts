@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getUserFromLocalStorage } from '../../../utils/helpers';
 import { AuthSliceState, User } from '../../../utils/types';
 import { isAuthFulfilledAction, isPendingAction, isRejectedAction } from '../../matchers';
 
 const initialState: AuthSliceState = {
-	user: null,
+	user: getUserFromLocalStorage(),
 	status: 'idle',
 	error: '',
 };

@@ -1,7 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { startLogoutTimer } from '../../../utils/helpers';
 import { ErrorObj, User, UserRequestBody } from '../../../utils/types';
 
 const baseUrl = 'http://localhost:5000/user';
+export let logoutTimerId: number;
 
 // this thunk will be responsible for sending a POST request to create a new user
 export const signUp = createAsyncThunk<User, UserRequestBody, { rejectValue: string }>(
@@ -22,7 +24,8 @@ export const signUp = createAsyncThunk<User, UserRequestBody, { rejectValue: str
 		const data = (await response.json()) as User;
 		// saving user to local storage
 		localStorage.setItem('memoriesUser', JSON.stringify(data));
-
+		// starting the logout timer
+		startLogoutTimer(logoutTimerId, thunkAPI.dispatch, data.token);
 		return data;
 	}
 );
@@ -49,6 +52,11 @@ export const logIn = createAsyncThunk<
 
 	// saving user to local storage
 	localStorage.setItem('memoriesUser', JSON.stringify(data));
+
+	// starting the logout timer
+	// this will log the user out when the token expires
+	startLogoutTimer(logoutTimerId, thunkAPI.dispatch, data.token);
+
 	return data;
 });
 
@@ -71,6 +79,9 @@ export const logInGoogle = createAsyncThunk<User, string, { rejectValue: string 
 
 		// saving user to local storage
 		localStorage.setItem('memoriesUser', JSON.stringify(data));
+
+		// starting the logout timer
+		startLogoutTimer(logoutTimerId, thunkAPI.dispatch, data.token);
 		return data;
 	}
 );

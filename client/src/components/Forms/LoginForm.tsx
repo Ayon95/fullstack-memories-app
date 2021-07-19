@@ -7,13 +7,11 @@ import { GoogleLogin, GoogleLoginResponse, GoogleLoginResponseOffline } from 're
 import { GoogleLoginFailedResponse } from '../../utils/types';
 import { useDispatch } from 'react-redux';
 import { logIn, logInGoogle } from '../../redux/slices/auth/authThunks';
-import { useHistory } from 'react-router-dom';
 
 function LoginForm() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
-	const history = useHistory();
 	const dispatch = useDispatch();
 
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -22,12 +20,8 @@ function LoginForm() {
 		if (![email, password].every(Boolean)) {
 			return console.log('email or password is missing for login');
 		}
-
 		// dispatch action to log the user in
 		dispatch(logIn({ email, password }));
-
-		// redirect user to home page
-		history.push('/home');
 	}
 
 	function handleGoogleLoginSuccess(response: GoogleLoginResponse | GoogleLoginResponseOffline) {
@@ -37,8 +31,6 @@ function LoginForm() {
 		// it will also check whether or not it needs to create a new user in the database
 		// a new user will be created if this user is logging in with Google for the first time
 		dispatch(logInGoogle(successResponse.tokenId));
-		// take user to home page
-		history.push('/home');
 	}
 
 	function handleGoogleLoginFailure(response: GoogleLoginFailedResponse) {
