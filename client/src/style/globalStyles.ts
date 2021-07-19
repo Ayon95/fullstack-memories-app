@@ -19,10 +19,15 @@ const GlobalStyles = createGlobalStyle`
         font-size: 1.6rem;
         font-family: 'Roboto', sans-serif;
         padding: 2rem;
+        color: ${stylesConfig.colorBlack};
     }
 
     h1, h2, h3 {
         color: ${stylesConfig.colorPrimary};
+    }
+
+    p {
+        line-height: 1.5;
     }
 
     .btn {

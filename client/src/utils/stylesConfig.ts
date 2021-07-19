@@ -13,6 +13,8 @@ const stylesConfig = {
 	colorGrey3: 'hsl(0, 0%, 43%)',
 	colorGrey4: 'hsl(0, 0%, 34%)',
 
+	colorBlack: 'hsl(0, 0%, 7.5%)',
+
 	inputFocusStyle: '0 0 0 1px rgb(16, 80, 183)',
 };
 

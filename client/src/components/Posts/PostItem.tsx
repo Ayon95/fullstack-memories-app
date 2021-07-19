@@ -11,6 +11,7 @@ import { deletePost, updateLikes } from './../../redux/slices/posts/postsThunks'
 import IconTextButton from '../Generic/IconTextButton';
 import { RootState } from '../../redux/store';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 type Props = { post: Post };
 
@@ -48,7 +49,7 @@ function PostItem({ post }: Props) {
 		return post.author._id === currentUser.userId;
 	}
 
-	function setPostAuthor() {
+	function getPostAuthor() {
 		if (isUserOwnPost()) {
 			return 'You';
 		} else {
@@ -57,21 +58,23 @@ function PostItem({ post }: Props) {
 	}
 	return (
 		<PostWrapper>
-			<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
-			<PostContent>
-				<PostInfo>
-					<PostTags>#{post.tags.join(' #')}</PostTags>
-					<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
-					<PostTitle>{post.title}</PostTitle>
-					<PostAuthor>
-						By: <span style={{ fontWeight: 'bold' }}>{setPostAuthor()}</span>
-					</PostAuthor>
-					<PostLikes>
-						{likeCount} {likeCount === 1 ? 'like' : 'likes'}
-					</PostLikes>
-				</PostInfo>
-				<PostDescription>{post.description}</PostDescription>
-			</PostContent>
+			<PostDetailsLink to={`/posts/${post._id}`} title="View Post Details">
+				<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
+				<PostContent>
+					<PostInfo>
+						<PostTags>#{post.tags.join(' #')}</PostTags>
+						<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
+						<PostTitle>{post.title}</PostTitle>
+						<PostAuthor>
+							By: <span style={{ fontWeight: 'bold' }}>{getPostAuthor()}</span>
+						</PostAuthor>
+						<PostLikes>
+							{likeCount} {likeCount === 1 ? 'like' : 'likes'}
+						</PostLikes>
+					</PostInfo>
+					<PostDescription>{post.description}</PostDescription>
+				</PostContent>
+			</PostDetailsLink>
 			<PostActions>
 				<IconTextButton
 					text={isLiked ? 'Unlike' : 'Like'}
@@ -105,6 +108,18 @@ function PostItem({ post }: Props) {
 
 export default PostItem;
 
+const PostDetailsLink = styled(Link)`
+	:link,
+	:visited,
+	:active {
+		text-decoration: none;
+		color: ${stylesConfig.colorBlack};
+		cursor: pointer;
+	}
+	/* works like horizontal auto margin because it's a flex item */
+	margin-bottom: auto;
+`;
+
 const PostWrapper = styled.article`
 	width: 100%;
 	max-width: 35rem;
@@ -125,8 +140,6 @@ const PostImage = styled.img`
 const PostContent = styled.div`
 	padding: 0 2rem;
 	margin-top: 2rem;
-	/* works like horizontal auto margin because it's a flex item */
-	margin-bottom: auto;
 `;
 
 const PostInfo = styled.div`
@@ -150,9 +163,7 @@ const PostDate = styled.p``;
 
 const PostLikes = styled.p``;
 
-const PostDescription = styled.p`
-	line-height: 1.5;
-`;
+const PostDescription = styled.p``;
 
 const PostActions = styled.div`
 	display: flex;

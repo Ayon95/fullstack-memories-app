@@ -48,6 +48,8 @@ export function checkExpiredToken(token: string) {
 	return decodedToken.exp! * 1000 < Date.now();
 }
 
+// this function will calculate the time after which the user's token will expire and set a timer
+// the user will be logged out when the timer finishes countdown
 export function startLogoutTimer(timerId: number, dispatch: Dispatch<any>, token: string) {
 	const decodedToken = jwtDecode<JwtPayload>(token);
 	// calculating the remaining time - the token will expire after this remaining time
