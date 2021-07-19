@@ -2,6 +2,7 @@ import express from 'express';
 import {
 	createPost,
 	deletePost,
+	getPost,
 	getPosts,
 	getPostsBySearch,
 	updateLikes,
@@ -17,6 +18,9 @@ router.get('/', authorizeUser, getPosts);
 
 // route handler for GET requests to get posts based on search query params
 router.get('/search', authorizeUser, getPostsBySearch);
+
+// route handler for GET request to get a single post
+router.get('/:id', getPost);
 
 // route handler for POST requests to the base route
 router.post('/', authorizeUser, createPost);

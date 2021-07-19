@@ -7,7 +7,7 @@ import stylesConfig from '../../utils/stylesConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import { postsActions } from '../../redux/slices/posts/postsSlice';
 import { useState } from 'react';
-import { deletePost, getPostsBySearch, updateLikes } from './../../redux/slices/posts/postsThunks';
+import { deletePost, updateLikes } from './../../redux/slices/posts/postsThunks';
 import IconTextButton from '../Generic/IconTextButton';
 import { RootState } from '../../redux/store';
 import { useEffect } from 'react';

@@ -64,3 +64,8 @@ export type SearchQuery = {
 	tags: string;
 	page: string;
 };
+
+// shape of getPost params object
+export type GetPostParams = {
+	id: string;
+};

@@ -18,13 +18,17 @@ function PostDetails() {
 	const { id } = useParams<{ id: string }>();
 	const { detailedPost: post, status, postItems } = useSelector((state: RootState) => state.posts);
 	const currentUser = useSelector((state: RootState) => state.auth.user) as User;
-	console.log('-----render-----', post, status, postItems);
+
+	// here we are filtering out the post itself (we only want other posts that are related to it)
+	const recommendedPosts = postItems?.filter(
+		post => post._id !== id && post.author._id !== currentUser!.userId
+	);
 
 	// get the post whose details page the user wants to see
 	useEffect(() => {
 		dispatch(getPost({ token: currentUser.token, id }));
 		console.log('fetching post');
-	}, [dispatch]);
+	}, [dispatch, currentUser.token, id]);
 
 	// get the related posts (posts that have tags in common with this post)
 	useEffect(() => {
@@ -38,43 +42,31 @@ function PostDetails() {
 			})
 		);
 		console.log('fetching related posts');
-	}, [post, dispatch]);
-
-	// if post doesn't exist (when this component renders for the first), then return null
-	if (!post) return null;
-
-	// show loading spinner while the necessary data is being fetched
-	if (status === 'pending') {
-		return <LoadingSpinner />;
-	}
-
-	// here we are filtering out the post itself (we only want other posts that are related to it)
-	const recommendedPosts = postItems.filter(
-		post => post._id !== id && post.author._id !== currentUser!.userId
-	);
-
-	console.log('after data has been fetched', post, status, recommendedPosts);
+	}, [post, currentUser.token, dispatch]);
 
 	return (
 		<Layout>
-			<PostDetailsContainer>
-				<TextContent>
-					<Tags>#{post.tags.join(' #')}</Tags>
-					<Title>{post.title}</Title>
-					<Author>
-						Created By:{' '}
-						<span style={{ fontWeight: 'bold' }}>{getPostAuthor(post, currentUser)}</span>
-					</Author>
-					<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
-					<Likes>
-						{post.likedBy.length} {post.likedBy.length === 1 ? 'like' : 'likes'}
-					</Likes>
-					<PostDescription>{post.description}</PostDescription>
-					<GoHomeLink to="/home">Go Home</GoHomeLink>
-				</TextContent>
-				<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
-			</PostDetailsContainer>
-			<RecommendedPosts posts={recommendedPosts} />
+			{status === 'pending' && <LoadingSpinner />}
+			{post && (
+				<PostDetailsContainer>
+					<TextContent>
+						<Tags>#{post.tags.join(' #')}</Tags>
+						<Title>{post.title}</Title>
+						<Author>
+							Created By:{' '}
+							<span style={{ fontWeight: 'bold' }}>{getPostAuthor(post, currentUser)}</span>
+						</Author>
+						<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
+						<Likes>
+							{post.likedBy.length} {post.likedBy.length === 1 ? 'like' : 'likes'}
+						</Likes>
+						<PostDescription>{post.description}</PostDescription>
+						<GoHomeLink to="/home">Go Home</GoHomeLink>
+					</TextContent>
+					<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
+				</PostDetailsContainer>
+			)}
+			{recommendedPosts && <RecommendedPosts posts={recommendedPosts} />}
 		</Layout>
 	);
 }

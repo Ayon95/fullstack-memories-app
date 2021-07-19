@@ -3,7 +3,7 @@
 import { Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import Post from '../models/Post';
-import { BasePost, PostDoc, SearchQuery } from '../utils/types';
+import { BasePost, GetPostParams, PostDoc, SearchQuery } from '../utils/types';
 
 export async function getPosts(
 	request: Request<ParamsDictionary, any, any, { page: string }>,
@@ -76,6 +76,22 @@ export async function getPostsBySearch(
 			.populate('author', { _id: 1, firstName: 1, lastName: 1 });
 
 		response.json({ posts, totalNumPages: Math.ceil(total / limit) });
+	} catch (error) {
+		response.status(404).json({ errorMessage: error.message });
+	}
+}
+
+export async function getPost(request: Request<GetPostParams>, response: Response) {
+	const { id } = request.params;
+
+	try {
+		const post = await Post.findById(id);
+
+		if (!post) {
+			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+		}
+
+		return response.json(post);
 	} catch (error) {
 		response.status(404).json({ errorMessage: error.message });
 	}
