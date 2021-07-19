@@ -43,6 +43,7 @@ export type Post = BasePost & {
 // shape of posts state
 export type PostsSliceState = {
 	postItems: Post[];
+	detailedPost: Post | null;
 	status: 'idle' | 'pending' | 'success' | 'failure';
 	error: string;
 	currentPostId: string;

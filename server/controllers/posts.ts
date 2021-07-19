@@ -39,20 +39,34 @@ export async function getPostsBySearch(
 	try {
 		// getting the query params
 		const { page, searchTerm, tags } = request.query;
-		const limit = 6;
-		const startIndex = (Number.parseFloat(page) - 1) * limit;
 		// converting the searchTerm to a regex, and making it case-insensitive
 		// since it is a regex, mongoose will simply check whether the title field value matches this regex
 		const title = new RegExp(searchTerm, 'i');
 		// converting the tags string into an array
 		const tagsArray = tags.split(',');
+
+		// if page is 'all', then return all the posts that match the search criteria (no need to paginate)
+		if (page === 'all') {
+			// getting the posts where either their title matches the search term
+			// or one of their tags is present in the list of tags that were passed
+			// if both search term and tags are specified, then all posts satisfying any of the two conditions will be selected
+			const allPosts = await Post.find({
+				$or: [{ title: title }, { tags: { $in: tagsArray } }],
+			})
+				.sort({ _id: -1 })
+				.populate('author', { _id: 1, firstName: 1, lastName: 1 });
+			return response.json({ posts: allPosts, totalNumPages: 0 });
+		}
+
+		// the number of posts to display per page
+		const limit = 6;
+		const startIndex = (Number.parseFloat(page) - 1) * limit;
 		// getting the total number of search results
 		const total = await Post.countDocuments({
 			$or: [{ title: title }, { tags: { $in: tagsArray } }],
 		});
-		// getting the posts where either their title matches the search term
-		// or one of their tags is present in the list of tags that were passed
-		// if both search term and tags are specified, then all posts satisfying any of the two conditions will be selected
+
+		// skipping to the first item of the specified page and only getting the specified number of pages
 		const posts = await Post.find({
 			$or: [{ title: title }, { tags: { $in: tagsArray } }],
 		})

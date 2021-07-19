@@ -1,17 +1,18 @@
 import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Post, User } from '../../utils/types';
 import { FaTrashAlt, FaEdit, FaThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import stylesConfig from '../../utils/stylesConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import { postsActions } from '../../redux/slices/posts/postsSlice';
 import { useState } from 'react';
-import { deletePost, updateLikes } from './../../redux/slices/posts/postsThunks';
+import { deletePost, getPostsBySearch, updateLikes } from './../../redux/slices/posts/postsThunks';
 import IconTextButton from '../Generic/IconTextButton';
 import { RootState } from '../../redux/store';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getPostAuthor } from '../../utils/helpers';
 
 type Props = { post: Post };
 
@@ -45,17 +46,6 @@ function PostItem({ post }: Props) {
 		setIsLiked(prevState => !prevState);
 	}
 
-	function isUserOwnPost() {
-		return post.author._id === currentUser.userId;
-	}
-
-	function getPostAuthor() {
-		if (isUserOwnPost()) {
-			return 'You';
-		} else {
-			return `${post.author.firstName} ${post.author.lastName}`;
-		}
-	}
 	return (
 		<PostWrapper>
 			<PostDetailsLink to={`/posts/${post._id}`} title="View Post Details">
@@ -63,11 +53,12 @@ function PostItem({ post }: Props) {
 				<PostContent>
 					<PostInfo>
 						<PostTags>#{post.tags.join(' #')}</PostTags>
-						<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
 						<PostTitle>{post.title}</PostTitle>
 						<PostAuthor>
-							By: <span style={{ fontWeight: 'bold' }}>{getPostAuthor()}</span>
+							Created By:{' '}
+							<span style={{ fontWeight: 'bold' }}>{getPostAuthor(post, currentUser)}</span>
 						</PostAuthor>
+						<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
 						<PostLikes>
 							{likeCount} {likeCount === 1 ? 'like' : 'likes'}
 						</PostLikes>
@@ -84,7 +75,7 @@ function PostItem({ post }: Props) {
 				/>
 
 				{/* the user can edit or delete only their own posts */}
-				{isUserOwnPost() && (
+				{post.author._id === currentUser.userId && (
 					<>
 						<IconTextButton
 							text="Edit"
@@ -107,6 +98,11 @@ function PostItem({ post }: Props) {
 }
 
 export default PostItem;
+
+const detailsCommonStyle = css`
+	font-size: 1.5rem;
+	color: ${stylesConfig.colorGrey3};
+`;
 
 const PostDetailsLink = styled(Link)`
 	:link,
@@ -147,9 +143,8 @@ const PostInfo = styled.div`
 `;
 
 const PostTags = styled.p`
-	font-size: 1.4rem;
+	${detailsCommonStyle}
 	margin-bottom: 2rem;
-	color: ${stylesConfig.colorGrey3};
 `;
 
 const PostTitle = styled.h3`
@@ -159,9 +154,13 @@ const PostTitle = styled.h3`
 
 const PostAuthor = styled.p``;
 
-const PostDate = styled.p``;
+const PostDate = styled.p`
+	${detailsCommonStyle}
+`;
 
-const PostLikes = styled.p``;
+const PostLikes = styled.p`
+	${detailsCommonStyle}
+`;
 
 const PostDescription = styled.p``;
 

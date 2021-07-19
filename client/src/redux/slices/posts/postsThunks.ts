@@ -30,6 +30,23 @@ export const getPosts = createAsyncThunk<
 	return data;
 });
 
+// thunk creator responsible for sending a GET request to get a specific post
+export const getPost = createAsyncThunk<
+	Post,
+	{ token: string; id: string },
+	{ rejectValue: string }
+>('posts/getPost', async (requestData, thunkAPI) => {
+	const response = await fetch(`${baseUrl}/${requestData.id}`);
+
+	if (!response.ok) {
+		const error = (await response.json()) as ErrorObj;
+		return thunkAPI.rejectWithValue(error.errorMessage);
+	}
+
+	const data = (await response.json()) as Post;
+	return data;
+});
+
 // thunk creator responsible for sending a GET request to get posts based on the search query
 export const getPostsBySearch = createAsyncThunk<
 	GetPostsResponse,
@@ -38,7 +55,7 @@ export const getPostsBySearch = createAsyncThunk<
 >('posts/getPostsBySearch', async (requestData, thunkAPI) => {
 	// specifying two query parameters -> searchTerm and tags
 	const response = await fetch(
-		// the url will look something like -> http://localhost:5000/posts/search?searchTerm=niagara&tags=niagara,canada,usa
+		// the url will look something like -> http://localhost:5000/posts/search?page=1&searchTerm=niagara&tags=niagara,canada,usa
 		`${baseUrl}/search?page=${requestData.page}&searchTerm=${
 			requestData.searchTerm || 'none'
 		}&tags=${requestData.tags || 'none'}`,

@@ -1,30 +1,60 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { RootState } from '../redux/store';
-import { Post } from '../utils/types';
+import { User } from '../utils/types';
 import Layout from './../components/Layout/Layout';
 import { formatDistanceToNow } from 'date-fns';
 import stylesConfig from '../utils/stylesConfig';
+import RecommendedPosts from '../components/Posts/RecommendedPosts';
+import { useEffect } from 'react';
+import { getPost, getPostsBySearch } from '../redux/slices/posts/postsThunks';
+import { getPostAuthor } from '../utils/helpers';
+import LoadingSpinner from '../components/Generic/LoadingSpinner';
 
 function PostDetails() {
+	const dispatch = useDispatch();
 	const { id } = useParams<{ id: string }>();
-	const post = useSelector((state: RootState) =>
-		state.posts.postItems.find(post => post._id === id)
-	) as Post;
+	const { detailedPost: post, status, postItems } = useSelector((state: RootState) => state.posts);
+	const currentUser = useSelector((state: RootState) => state.auth.user) as User;
+	console.log('-----render-----', post, status, postItems);
 
-	const currentUser = useSelector((state: RootState) => state.auth.user);
+	// get the post whose details page the user wants to see
+	useEffect(() => {
+		dispatch(getPost({ token: currentUser.token, id }));
+		console.log('fetching post');
+	}, [dispatch]);
 
-	function getPostAuthor() {
-		if (post.author._id === currentUser?.userId) {
-			return 'You';
-		} else {
-			return `${post.author.firstName} ${post.author.lastName}`;
-		}
+	// get the related posts (posts that have tags in common with this post)
+	useEffect(() => {
+		if (!post) return;
+		dispatch(
+			getPostsBySearch({
+				token: currentUser.token,
+				page: 'all',
+				searchTerm: 'none',
+				tags: post.tags.join(','),
+			})
+		);
+		console.log('fetching related posts');
+	}, [post, dispatch]);
+
+	// if post doesn't exist (when this component renders for the first), then return null
+	if (!post) return null;
+
+	// show loading spinner while the necessary data is being fetched
+	if (status === 'pending') {
+		return <LoadingSpinner />;
 	}
 
-	const likeCount = post.likedBy.length;
+	// here we are filtering out the post itself (we only want other posts that are related to it)
+	const recommendedPosts = postItems.filter(
+		post => post._id !== id && post.author._id !== currentUser!.userId
+	);
+
+	console.log('after data has been fetched', post, status, recommendedPosts);
+
 	return (
 		<Layout>
 			<PostDetailsContainer>
@@ -32,17 +62,19 @@ function PostDetails() {
 					<Tags>#{post.tags.join(' #')}</Tags>
 					<Title>{post.title}</Title>
 					<Author>
-						Created By: <span style={{ fontWeight: 'bold' }}>{getPostAuthor()}</span>
+						Created By:{' '}
+						<span style={{ fontWeight: 'bold' }}>{getPostAuthor(post, currentUser)}</span>
 					</Author>
 					<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
 					<Likes>
-						{likeCount} {likeCount === 1 ? 'like' : 'likes'}
+						{post.likedBy.length} {post.likedBy.length === 1 ? 'like' : 'likes'}
 					</Likes>
 					<PostDescription>{post.description}</PostDescription>
 					<GoHomeLink to="/home">Go Home</GoHomeLink>
 				</TextContent>
 				<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
 			</PostDetailsContainer>
+			<RecommendedPosts posts={recommendedPosts} />
 		</Layout>
 	);
 }
@@ -57,6 +89,7 @@ const detailsCommonStyle = css`
 const PostDetailsContainer = styled.main`
 	box-shadow: ${stylesConfig.shadowNormal};
 	padding: 2rem;
+	margin-bottom: 2rem;
 	border-radius: 0.5rem;
 	display: flex;
 	justify-content: space-between;
@@ -64,9 +97,8 @@ const PostDetailsContainer = styled.main`
 const PostImage = styled.img`
 	border-radius: 0.5rem;
 	box-shadow: ${stylesConfig.shadowThin};
-	width: 100%;
+	width: 50%;
 	max-width: 64rem;
-	height: 40rem;
 	object-fit: cover;
 `;
 const TextContent = styled.div`
@@ -77,7 +109,9 @@ const TextContent = styled.div`
 const Tags = styled.p`
 	${detailsCommonStyle}
 `;
-const Title = styled.h1``;
+const Title = styled.h1`
+	font-size: 3.6rem;
+`;
 const Author = styled.p`
 	font-size: 1.8rem;
 `;

@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Post, PostsSliceState } from '../../../utils/types';
 import { isPendingAction, isRejectedAction, isUpdateFulfilledAction } from '../../matchers';
-import { createPost, deletePost, getPosts, getPostsBySearch } from './postsThunks';
+import { createPost, deletePost, getPost, getPosts, getPostsBySearch } from './postsThunks';
 
 const initialState: PostsSliceState = {
 	postItems: [],
+	detailedPost: null,
 	status: 'idle',
 	error: '',
 	currentPostId: '',
@@ -39,6 +40,11 @@ const postsSlice = createSlice({
 			state.status = 'success';
 			state.postItems = action.payload.posts;
 			state.totalNumPages = action.payload.totalNumPages;
+		});
+
+		builder.addCase(getPost.fulfilled, (state, action) => {
+			state.status = 'success';
+			state.detailedPost = action.payload;
 		});
 
 		builder.addCase(createPost.fulfilled, (state, action) => {
