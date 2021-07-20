@@ -27,7 +27,6 @@ function PostDetails() {
 	// get the post whose details page the user wants to see
 	useEffect(() => {
 		dispatch(getPost({ token: currentUser.token, id }));
-		console.log('fetching post');
 	}, [dispatch, currentUser.token, id]);
 
 	// get the related posts (posts that have tags in common with this post)
@@ -41,7 +40,6 @@ function PostDetails() {
 				tags: post.tags.join(','),
 			})
 		);
-		console.log('fetching related posts');
 	}, [post, currentUser.token, dispatch]);
 
 	return (
@@ -66,7 +64,7 @@ function PostDetails() {
 					<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
 				</PostDetailsContainer>
 			)}
-			{recommendedPosts && <RecommendedPosts posts={recommendedPosts} />}
+			{recommendedPosts.length > 0 && <RecommendedPosts posts={recommendedPosts} />}
 		</Layout>
 	);
 }

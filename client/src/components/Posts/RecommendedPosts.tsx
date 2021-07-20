@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import stylesConfig from '../../utils/stylesConfig';
 import { Post } from '../../utils/types';
@@ -14,15 +15,17 @@ function RecommendedPosts({ posts }: Props) {
 			<RecommendedPostsList>
 				{posts.map(post => (
 					<RecommendedPost key={post._id}>
-						<h3>{post.title}</h3>
-						<Author>
-							Created By:{' '}
-							<span>
-								{post.author.firstName} {post.author.lastName}
-							</span>
-						</Author>
-						<PostDescription>{post.description.substring(0, 100)}....</PostDescription>
-						<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
+						<LinkWrapper to={`/posts/${post._id}`} title="View Post Details">
+							<h3>{post.title}</h3>
+							<Author>
+								Created By:{' '}
+								<span>
+									{post.author.firstName} {post.author.lastName}
+								</span>
+							</Author>
+							<PostDescription>{post.description.substring(0, 100)}....</PostDescription>
+							<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
+						</LinkWrapper>
 					</RecommendedPost>
 				))}
 			</RecommendedPostsList>
@@ -43,6 +46,11 @@ const RecommendedPostsContainer = styled.div`
 const RecommendedPostsList = styled.ul`
 	list-style: none;
 	display: flex;
+`;
+
+const LinkWrapper = styled(Link)`
+	text-decoration: none;
+	color: ${stylesConfig.colorBlack};
 `;
 
 const RecommendedPost = styled.li`

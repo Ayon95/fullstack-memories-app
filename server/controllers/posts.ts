@@ -85,7 +85,7 @@ export async function getPost(request: Request<GetPostParams>, response: Respons
 	const { id } = request.params;
 
 	try {
-		const post = await Post.findById(id);
+		const post = await Post.findById(id).populate('author', { _id: 1, firstName: 1, lastName: 1 });
 
 		if (!post) {
 			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
