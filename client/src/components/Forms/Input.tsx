@@ -41,9 +41,7 @@ function Input(props: Props) {
 
 export default Input;
 
-const FormControl = styled.div`
-	margin-bottom: 2rem;
-`;
+const FormControl = styled.div``;
 
 const Label = styled.label`
 	display: block;

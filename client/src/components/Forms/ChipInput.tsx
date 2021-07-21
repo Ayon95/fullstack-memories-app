@@ -64,8 +64,6 @@ function ChipInput({ name, label, chips, setChips }: Props) {
 }
 
 const ChipInputWrapper = styled.div`
-	margin-bottom: 2rem;
-
 	label {
 		font-weight: bold;
 		display: inline-block;

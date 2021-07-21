@@ -24,11 +24,14 @@ const FormComponent = styled.form`
 	padding: 2rem;
 	border-radius: 4px;
 	box-shadow: ${stylesConfig.shadowNormal};
-	/* width: 38rem; */
+
+	> :not(:last-child) {
+		margin-bottom: 2rem;
+	}
 `;
 
 const FormTitle = styled.h3`
 	text-align: center;
 	font-size: 2.2rem;
-	margin-bottom: 2rem;
+	/* margin-bottom: 2rem; */
 `;

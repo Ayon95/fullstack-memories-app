@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import { getPost, getPostsBySearch } from '../redux/slices/posts/postsThunks';
 import { getPostAuthor } from '../utils/helpers';
 import LoadingSpinner from '../components/Generic/LoadingSpinner';
+import Comments from '../components/Comments/Comments';
 
 function PostDetails() {
 	const dispatch = useDispatch();
@@ -59,6 +60,7 @@ function PostDetails() {
 							{post.likedBy.length} {post.likedBy.length === 1 ? 'like' : 'likes'}
 						</Likes>
 						<PostDescription>{post.description}</PostDescription>
+						<Comments />
 						<GoHomeLink to="/home">Go Home</GoHomeLink>
 					</TextContent>
 					<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
@@ -89,6 +91,7 @@ const PostImage = styled.img`
 	box-shadow: ${stylesConfig.shadowThin};
 	width: 50%;
 	max-width: 64rem;
+	max-height: 40rem;
 	object-fit: cover;
 `;
 const TextContent = styled.div`

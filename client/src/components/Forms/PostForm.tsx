@@ -100,7 +100,6 @@ function Form() {
 				placeholder="e.g. outdoors,nature,fun"
 			/>
 			<input
-				className="input--file"
 				type="file"
 				name="postImage"
 				id="postImage"
