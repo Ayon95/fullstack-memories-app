@@ -1,7 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Post, PostsSliceState } from '../../../utils/types';
 import { isPendingAction, isRejectedAction, isUpdateFulfilledAction } from '../../matchers';
-import { createPost, deletePost, getPost, getPosts, getPostsBySearch } from './postsThunks';
+import {
+	addComment,
+	createPost,
+	deletePost,
+	getPost,
+	getPosts,
+	getPostsBySearch,
+} from './postsThunks';
 
 const initialState: PostsSliceState = {
 	postItems: [],
@@ -50,6 +57,22 @@ const postsSlice = createSlice({
 		builder.addCase(createPost.fulfilled, (state, action) => {
 			state.status = 'success';
 			state.postItems.push(action.payload);
+		});
+
+		builder.addCase(addComment.fulfilled, (state, action) => {
+			state.status = 'success';
+			// finding the post that the user commented on
+			const commentedPost = state.postItems.find(
+				post => post._id === action.payload.postId
+			) as Post;
+			// adding the comment to the post's comments list
+			commentedPost.comments.push(action.payload);
+			// getting the updated posts list
+			const updatedPostsList = state.postItems.map(post =>
+				post._id === commentedPost._id ? commentedPost : post
+			);
+			// replacing the old posts list with the updated posts list
+			state.postItems = updatedPostsList;
 		});
 
 		builder.addCase(deletePost.fulfilled, (state, action) => {

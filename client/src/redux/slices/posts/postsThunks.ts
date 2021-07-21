@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { BasePost, ErrorObj, GetPostsResponse, Post } from '../../../utils/types';
+import { BasePost, Comment, ErrorObj, GetPostsResponse, Post } from '../../../utils/types';
 
 const baseUrl = 'http://localhost:5000/posts';
 
@@ -138,6 +138,30 @@ export const updateLikes = createAsyncThunk<
 	}
 
 	const data = (await response.json()) as Post;
+	return data;
+});
+
+// thunk creator responsible for sending a POSt request to add a comment to a post
+export const addComment = createAsyncThunk<
+	Comment,
+	{ id: string; token: string; comment: string },
+	{ rejectValue: string }
+>('posts/addComment', async (requestData, thunkAPI) => {
+	const response = await fetch(`${baseUrl}/${requestData.id}/comment`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${requestData.token}`,
+		},
+		body: JSON.stringify({ comment: requestData.comment }),
+	});
+
+	if (!response.ok) {
+		const error = (await response.json()) as ErrorObj;
+		return thunkAPI.rejectWithValue(error.errorMessage);
+	}
+
+	const data = (await response.json()) as Comment;
 	return data;
 });
 
