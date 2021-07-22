@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+	addComment,
 	createPost,
 	deletePost,
 	getPost,
@@ -24,6 +25,9 @@ router.get('/:id', getPost);
 
 // route handler for POST requests to the base route
 router.post('/', authorizeUser, createPost);
+
+// route handler for POST request to add a comment to a specific post
+router.post('/:id/comment', authorizeUser, addComment);
 
 // route handler for PATCH request to a specific post route
 router.patch('/:id', authorizeUser, updatePost);

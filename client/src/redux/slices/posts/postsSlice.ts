@@ -59,20 +59,17 @@ const postsSlice = createSlice({
 			state.postItems.push(action.payload);
 		});
 
+		// action.payload will be the post object containing the new comment
 		builder.addCase(addComment.fulfilled, (state, action) => {
 			state.status = 'success';
-			// finding the post that the user commented on
-			const commentedPost = state.postItems.find(
-				post => post._id === action.payload.postId
-			) as Post;
-			// adding the comment to the post's comments list
-			commentedPost.comments.push(action.payload);
 			// getting the updated posts list
 			const updatedPostsList = state.postItems.map(post =>
-				post._id === commentedPost._id ? commentedPost : post
+				post._id === action.payload._id ? action.payload : post
 			);
 			// replacing the old posts list with the updated posts list
 			state.postItems = updatedPostsList;
+			// also updating the detailed post so that it contains the updated comments list
+			state.detailedPost = action.payload;
 		});
 
 		builder.addCase(deletePost.fulfilled, (state, action) => {

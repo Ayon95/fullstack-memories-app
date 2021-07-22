@@ -23,11 +23,12 @@ export type AuthSliceState = {
 };
 
 // shape of a Comment object
-export type Comment = {
+export type CommentObj = {
 	_id: string;
 	postId: string;
-	author: { firstName: string; lastName: string };
-	body: string;
+	author: { _id: string; firstName: string; lastName: string };
+	comment: string;
+	createdAt: Date;
 };
 
 // shape of base post object
@@ -42,7 +43,7 @@ export type BasePost = {
 export type Post = BasePost & {
 	_id: string;
 	author: { _id: string; firstName: string; lastName: string };
-	comments: Comment[];
+	comments: CommentObj[];
 	likedBy: string[];
 	// a Date object gets parsed to a string after parsing the JSON data sent by the server
 	// parse it back to a date object yourself wherever you are using it, e.g. in the PostItem component

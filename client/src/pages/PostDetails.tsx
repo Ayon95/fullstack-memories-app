@@ -10,7 +10,7 @@ import stylesConfig from '../utils/stylesConfig';
 import RecommendedPosts from '../components/Posts/RecommendedPosts';
 import { useEffect } from 'react';
 import { getPost, getPostsBySearch } from '../redux/slices/posts/postsThunks';
-import { getPostAuthor } from '../utils/helpers';
+import { getAuthorName } from '../utils/helpers';
 import LoadingSpinner from '../components/Generic/LoadingSpinner';
 import Comments from '../components/Comments/Comments';
 
@@ -53,7 +53,7 @@ function PostDetails() {
 						<Title>{post.title}</Title>
 						<Author>
 							Created By:{' '}
-							<span style={{ fontWeight: 'bold' }}>{getPostAuthor(post, currentUser)}</span>
+							<span style={{ fontWeight: 'bold' }}>{getAuthorName(post, currentUser)}</span>
 						</Author>
 						<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
 						<Likes>

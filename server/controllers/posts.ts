@@ -2,6 +2,7 @@
 
 import { Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
+import Comment from '../models/Comment';
 import Post from '../models/Post';
 import { BasePost, GetPostParams, PostDoc, SearchQuery } from '../utils/types';
 
@@ -24,7 +25,16 @@ export async function getPosts(
 			.skip(startIndex)
 			.limit(limit)
 			.sort({ _id: -1 })
-			.populate('author', { _id: 1, firstName: 1, lastName: 1 });
+			.populate([
+				{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+				{
+					path: 'comments',
+					populate: {
+						path: 'author',
+						select: { _id: 1, firstName: 1, lastName: 1 },
+					},
+				},
+			]);
 		response.json({ posts, totalNumPages: Math.ceil(total / limit) });
 	} catch (error) {
 		console.log(error);
@@ -54,7 +64,16 @@ export async function getPostsBySearch(
 				$or: [{ title: title }, { tags: { $in: tagsArray } }],
 			})
 				.sort({ _id: -1 })
-				.populate('author', { _id: 1, firstName: 1, lastName: 1 });
+				.populate([
+					{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+					{
+						path: 'comments',
+						populate: {
+							path: 'author',
+							select: { _id: 1, firstName: 1, lastName: 1 },
+						},
+					},
+				]);
 			return response.json({ posts: allPosts, totalNumPages: 0 });
 		}
 
@@ -73,7 +92,13 @@ export async function getPostsBySearch(
 			.skip(startIndex)
 			.limit(limit)
 			.sort({ _id: -1 })
-			.populate('author', { _id: 1, firstName: 1, lastName: 1 });
+			.populate([
+				{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+				{
+					path: 'comments',
+					populate: { path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+				},
+			]);
 
 		response.json({ posts, totalNumPages: Math.ceil(total / limit) });
 	} catch (error) {
@@ -85,7 +110,13 @@ export async function getPost(request: Request<GetPostParams>, response: Respons
 	const { id } = request.params;
 
 	try {
-		const post = await Post.findById(id).populate('author', { _id: 1, firstName: 1, lastName: 1 });
+		const post = await Post.findById(id).populate([
+			{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+			{
+				path: 'comments',
+				populate: { path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+			},
+		]);
 
 		if (!post) {
 			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
@@ -113,6 +144,7 @@ export async function createPost(request: Request, response: Response) {
 			...post,
 			author: user._id,
 			likedBy: [],
+			comments: [],
 			createdAt: new Date(),
 		});
 
@@ -129,6 +161,52 @@ export async function createPost(request: Request, response: Response) {
 		await user.save();
 
 		response.status(201).json(newPost);
+	} catch (error) {
+		response.status(409).json({ errorMessage: error.message });
+	}
+}
+
+export async function addComment(
+	request: Request<ParamsDictionary, any, { comment: string }>,
+	response: Response
+) {
+	const { id } = request.params;
+	const user = request.user!;
+
+	if (!request.body.comment) {
+		return response.status(400).json({ errorMessage: 'A required field is missing' });
+	}
+
+	try {
+		const post = await Post.findById(id);
+		if (!post) {
+			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+		}
+
+		const newComment = await Comment.create({
+			postId: post._id,
+			comment: request.body.comment,
+			author: user._id,
+			createdAt: new Date(),
+		});
+
+		// adding the id of the new comment to the post's comments array
+		post.comments = [...post.comments, newComment._id];
+
+		// saving the post
+		await post.save();
+
+		// populating the author and comments fields of post
+		// inside each comment, we are populating the author field
+		await Post.populate(post, [
+			{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+			{
+				path: 'comments',
+				populate: { path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+			},
+		]);
+
+		response.status(201).json(post);
 	} catch (error) {
 		response.status(409).json({ errorMessage: error.message });
 	}
@@ -152,11 +230,17 @@ export async function updatePost(request: Request, response: Response) {
 		// if new is set to true, the updated document will be returned
 		const updatedPost = await Post.findByIdAndUpdate(id, post, { new: true });
 
-		// populating the author field of the updated post
-		await Post.populate(updatedPost, {
-			path: 'author',
-			select: { _id: 1, firstName: 1, lastName: 1 },
-		});
+		// populating the author and comments fields of the updated post
+		await Post.populate(updatedPost, [
+			{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+			{
+				path: 'comments',
+				populate: { path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+			},
+		]);
+
+		// populating the comments field
+		await Post.populate(updatedPost, { path: 'comments' });
 
 		return response.json(updatedPost);
 	} catch (error) {
@@ -192,11 +276,13 @@ export async function updateLikes(request: Request, response: Response) {
 	// updating only the likedBy field of the post
 	const updatedPost = await Post.findByIdAndUpdate(id, { likedBy: updatedLikedBy }, { new: true });
 
-	// populating the author field of the updated post
-	await Post.populate(updatedPost, {
-		path: 'author',
-		select: { _id: 1, firstName: 1, lastName: 1 },
-	});
+	await Post.populate(updatedPost, [
+		{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+		{
+			path: 'comments',
+			populate: { path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+		},
+	]);
 
 	return response.json(updatedPost);
 }

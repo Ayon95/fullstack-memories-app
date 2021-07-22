@@ -12,7 +12,7 @@ import IconTextButton from '../Generic/IconTextButton';
 import { RootState } from '../../redux/store';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getPostAuthor } from '../../utils/helpers';
+import { getAuthorName } from '../../utils/helpers';
 
 type Props = { post: Post };
 
@@ -56,7 +56,7 @@ function PostItem({ post }: Props) {
 						<PostTitle>{post.title}</PostTitle>
 						<PostAuthor>
 							Created By:{' '}
-							<span style={{ fontWeight: 'bold' }}>{getPostAuthor(post, currentUser)}</span>
+							<span style={{ fontWeight: 'bold' }}>{getAuthorName(post, currentUser)}</span>
 						</PostAuthor>
 						<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
 						<PostLikes>

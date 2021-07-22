@@ -23,7 +23,16 @@ export interface PostDoc extends mongoose.Document {
 	description: string;
 	tags: string[];
 	selectedFile: string;
+	comments: string[];
 	likedBy: string[];
+	createdAt: Date;
+}
+
+// shape of Comment Doc
+export interface CommentDoc extends mongoose.Document {
+	postId: string;
+	author: string;
+	comment: string;
 	createdAt: Date;
 }
 

@@ -1,7 +1,7 @@
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { Dispatch } from 'react';
 import { authActions } from '../redux/slices/auth/authSlice';
-import { Post, User } from './types';
+import { CommentObj, Post, User } from './types';
 
 export async function convertToBase64(file: File) {
 	const binaryString = await readFileBinaryAsync(file);
@@ -62,10 +62,16 @@ export function startLogoutTimer(timerId: number, dispatch: Dispatch<any>, token
 	}, remainingTime);
 }
 
-export function getPostAuthor(post: Post, currentUser: User) {
+export function getAuthorName(post: Post | CommentObj, currentUser: User) {
 	if (post.author._id === currentUser!.userId) {
 		return 'You';
 	} else {
 		return `${post.author.firstName} ${post.author.lastName}`;
 	}
+}
+
+export function getCommentsHeading(commentCount: number) {
+	if (commentCount === 0) return 'No Comments';
+	if (commentCount === 1) return '1 Comment';
+	return `${commentCount} Comments`;
 }

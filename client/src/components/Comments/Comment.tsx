@@ -1,16 +1,21 @@
+import { formatDistanceToNow } from 'date-fns';
 import React from 'react';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { RootState } from '../../redux/store';
+import { getAuthorName } from '../../utils/helpers';
 import stylesConfig from '../../utils/stylesConfig';
+import { CommentObj, User } from '../../utils/types';
 
-function Comment() {
+type Props = { commentData: CommentObj };
+
+function Comment({ commentData }: Props) {
+	const currentUser = useSelector((state: RootState) => state.auth.user) as User;
 	return (
 		<CommentItem>
-			<Author>Mushfiq Rahman</Author>
-			<Date>2 days ago</Date>
-			<CommentBody>
-				Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci repellat nam rerum debitis
-				aliquam illo delectus in sed quis iusto!
-			</CommentBody>
+			<Author>{getAuthorName(commentData, currentUser)}</Author>
+			<CommentDate>{formatDistanceToNow(new Date(commentData.createdAt))} ago</CommentDate>
+			<CommentBody>{commentData.comment}</CommentBody>
 		</CommentItem>
 	);
 }
@@ -27,7 +32,7 @@ const Author = styled.span`
 	font-weight: bold;
 	margin-right: 0.5rem;
 `;
-const Date = styled.span`
+const CommentDate = styled.span`
 	color: ${stylesConfig.colorGrey4};
 	font-size: 1.3rem;
 `;

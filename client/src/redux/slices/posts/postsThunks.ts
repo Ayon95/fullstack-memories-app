@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { BasePost, Comment, ErrorObj, GetPostsResponse, Post } from '../../../utils/types';
+import { BasePost, ErrorObj, GetPostsResponse, Post } from '../../../utils/types';
 
 const baseUrl = 'http://localhost:5000/posts';
 
@@ -143,7 +143,7 @@ export const updateLikes = createAsyncThunk<
 
 // thunk creator responsible for sending a POSt request to add a comment to a post
 export const addComment = createAsyncThunk<
-	Comment,
+	Post,
 	{ id: string; token: string; comment: string },
 	{ rejectValue: string }
 >('posts/addComment', async (requestData, thunkAPI) => {
@@ -161,7 +161,7 @@ export const addComment = createAsyncThunk<
 		return thunkAPI.rejectWithValue(error.errorMessage);
 	}
 
-	const data = (await response.json()) as Comment;
+	const data = (await response.json()) as Post;
 	return data;
 });
 

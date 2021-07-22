@@ -1,20 +1,36 @@
 import React from 'react';
 import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { addComment } from '../../redux/slices/posts/postsThunks';
+import { RootState } from '../../redux/store';
+import { getCommentsHeading } from '../../utils/helpers';
+import { Post } from '../../utils/types';
 import Input from '../Forms/Input';
 import Button from '../Generic/Button';
 import Comment from './Comment';
 
 function Comments() {
 	const [comment, setComment] = useState('');
+	const post = useSelector((state: RootState) => state.posts.detailedPost) as Post;
+	const token = useSelector((state: RootState) => state.auth.user!.token);
+	const dispatch = useDispatch();
+
+	function handleSubmitComment(e: React.FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		if (!comment) return console.log('comment is missing');
+		dispatch(addComment({ id: post._id, token, comment }));
+		setComment('');
+	}
 	return (
 		<CommentsContainer>
 			<CommentsList>
-				<h3>Comments</h3>
-				<Comment />
-				<Comment />
+				<h3>{getCommentsHeading(post.comments.length)}</h3>
+				{post.comments.map(comment => (
+					<Comment key={comment._id} commentData={comment} />
+				))}
 			</CommentsList>
-			<CommentForm>
+			<CommentForm onSubmit={handleSubmitComment}>
 				<Input
 					inputType="textarea"
 					name="comment"
@@ -23,7 +39,7 @@ function Comments() {
 					setValue={setComment}
 				/>
 
-				<Button text="Comment" color="primary" style={{ marginTop: '1rem' }} />
+				<Button text="Comment" type="submit" color="primary" style={{ marginTop: '1rem' }} />
 			</CommentForm>
 		</CommentsContainer>
 	);

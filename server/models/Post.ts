@@ -15,6 +15,13 @@ const postSchema = new mongoose.Schema<PostDoc>({
 			ref: 'BaseUser',
 		},
 	],
+	// an array containing the ids of comments belonging to this post
+	comments: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Comment',
+		},
+	],
 	createdAt: { type: Date },
 });
 

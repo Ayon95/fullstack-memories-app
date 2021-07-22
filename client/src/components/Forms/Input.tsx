@@ -32,7 +32,6 @@ function Input(props: Props) {
 					maxLength={250}
 					onChange={e => props.setValue(e.target.value)}
 					rows={6}
-					placeholder="Maximum 250 characters"
 				/>
 			)}
 		</FormControl>
