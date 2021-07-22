@@ -10,7 +10,7 @@ import { deletePost, updateLikes } from './../../redux/slices/posts/postsThunks'
 import IconTextButton from '../Generic/IconTextButton';
 import { RootState } from '../../redux/store';
 import { Link } from 'react-router-dom';
-import { getAuthorName } from '../../utils/helpers';
+import { getFormattedAuthorName, getFormattedDescription } from '../../utils/helpers';
 
 type Props = { post: Post };
 
@@ -18,8 +18,9 @@ function PostItem({ post }: Props) {
 	const currentUser = useSelector((state: RootState) => state.auth.user) as User;
 	const { postItems: posts, currentPage } = useSelector((state: RootState) => state.posts);
 	const dispatch = useDispatch();
-	const likeCount = post.likedBy.length;
 
+	// we can use these two state variables to give instant feedback to the user (while the actual update of likes takes place in the backend)
+	const [likeCount, setLikeCount] = useState(post.likedBy.length);
 	const [isLiked, setIsLiked] = useState(post.likedBy.includes(currentUser.userId));
 
 	function handleClickEdit() {
@@ -35,12 +36,13 @@ function PostItem({ post }: Props) {
 	}
 
 	function handleClickLike() {
+		// if the post is already liked, then unlike the post
+		if (isLiked) setLikeCount(prevState => prevState - 1);
+		// if the post is not liked, then like the post
+		if (!isLiked) setLikeCount(prevState => prevState + 1);
+		setIsLiked(prevState => !prevState);
 		// this will send a PATCH request and the server will update the likes of the post
 		dispatch(updateLikes({ id: post._id, token: currentUser.token }));
-
-		// if the post is already liked, then unlike the post
-		// if the post is not liked, then like the post
-		setIsLiked(prevState => !prevState);
 	}
 
 	return (
@@ -53,14 +55,16 @@ function PostItem({ post }: Props) {
 						<PostTitle>{post.title}</PostTitle>
 						<PostAuthor>
 							Created By:{' '}
-							<span style={{ fontWeight: 'bold' }}>{getAuthorName(post, currentUser)}</span>
+							<span style={{ fontWeight: 'bold' }}>
+								{getFormattedAuthorName(post, currentUser)}
+							</span>
 						</PostAuthor>
 						<PostDate>{formatDistanceToNow(new Date(post.createdAt))} ago</PostDate>
 						<PostLikes>
 							{likeCount} {likeCount === 1 ? 'like' : 'likes'}
 						</PostLikes>
 					</PostInfo>
-					<PostDescription>{post.description}</PostDescription>
+					<PostDescription>{getFormattedDescription(post.description)}</PostDescription>
 				</PostContent>
 			</PostDetailsLink>
 			<PostActions>

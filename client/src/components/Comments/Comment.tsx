@@ -3,7 +3,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { RootState } from '../../redux/store';
-import { getAuthorName } from '../../utils/helpers';
+import { getFormattedAuthorName } from '../../utils/helpers';
 import stylesConfig from '../../utils/stylesConfig';
 import { CommentObj, User } from '../../utils/types';
 
@@ -13,7 +13,7 @@ function Comment({ commentData }: Props) {
 	const currentUser = useSelector((state: RootState) => state.auth.user) as User;
 	return (
 		<CommentItem>
-			<Author>{getAuthorName(commentData, currentUser)}</Author>
+			<Author>{getFormattedAuthorName(commentData, currentUser)}</Author>
 			<CommentDate>{formatDistanceToNow(new Date(commentData.createdAt))} ago</CommentDate>
 			<CommentBody>{commentData.comment}</CommentBody>
 		</CommentItem>

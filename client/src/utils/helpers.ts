@@ -62,12 +62,17 @@ export function startLogoutTimer(timerId: number, dispatch: Dispatch<any>, token
 	}, remainingTime);
 }
 
-export function getAuthorName(post: Post | CommentObj, currentUser: User) {
+export function getFormattedAuthorName(post: Post | CommentObj, currentUser: User) {
 	if (post.author._id === currentUser!.userId) {
 		return 'You';
 	} else {
 		return `${post.author.firstName} ${post.author.lastName}`;
 	}
+}
+
+export function getFormattedDescription(description: string) {
+	if (description.length <= 100) return description;
+	return `${description.substring(0, 100)}....`;
 }
 
 export function getCommentsHeading(commentCount: number) {

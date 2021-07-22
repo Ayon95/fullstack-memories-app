@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { getFormattedDescription } from '../../utils/helpers';
 import stylesConfig from '../../utils/stylesConfig';
 import { Post } from '../../utils/types';
 
@@ -23,7 +24,7 @@ function RecommendedPosts({ posts }: Props) {
 									{post.author.firstName} {post.author.lastName}
 								</span>
 							</Author>
-							<PostDescription>{post.description.substring(0, 100)}....</PostDescription>
+							<PostDescription>{getFormattedDescription(post.description)}</PostDescription>
 							<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
 						</LinkWrapper>
 					</RecommendedPost>

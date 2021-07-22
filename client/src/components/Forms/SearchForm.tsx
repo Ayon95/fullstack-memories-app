@@ -58,22 +58,24 @@ function SearchForm() {
 
 			<ChipInput name="tags" label="Tags" chips={tags} setChips={setTags} />
 
-			<Button
-				text="Submit"
-				color="primary"
-				type="submit"
-				isDisabled={status === 'pending'}
-				style={{ width: '100%' }}
-			/>
-			{location.pathname.includes('search') && (
+			<div>
 				<Button
-					text="Reset"
-					color="secondary"
+					text="Submit"
+					color="primary"
+					type="submit"
 					isDisabled={status === 'pending'}
-					style={{ width: '100%', marginTop: '1rem' }}
-					handleClick={handleClickReset}
+					style={{ width: '100%' }}
 				/>
-			)}
+				{location.pathname.includes('search') && (
+					<Button
+						text="Reset"
+						color="secondary"
+						isDisabled={status === 'pending'}
+						style={{ width: '100%', marginTop: '1rem' }}
+						handleClick={handleClickReset}
+					/>
+				)}
+			</div>
 			{location.pathname.includes('search') && (
 				<SearchResultsText>Found {posts.length || 'No'} results</SearchResultsText>
 			)}
@@ -84,7 +86,6 @@ function SearchForm() {
 export default SearchForm;
 
 const SearchResultsText = styled.p`
-	margin-top: 1rem;
 	font-style: italic;
 	color: ${stylesConfig.colorGrey3};
 `;

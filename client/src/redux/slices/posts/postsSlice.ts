@@ -1,14 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Post, PostsSliceState } from '../../../utils/types';
-import { isPendingAction, isRejectedAction, isUpdateFulfilledAction } from '../../matchers';
+import { PaginatedPostsResponse, Post, PostsSliceState } from '../../../utils/types';
 import {
-	addComment,
-	createPost,
-	deletePost,
-	getPost,
-	getPosts,
-	getPostsBySearch,
-} from './postsThunks';
+	isPaginatedFulfilledAction,
+	isPendingAction,
+	isRejectedAction,
+	isUpdateFulfilledAction,
+} from '../../matchers';
+import { addComment, getPost } from './postsThunks';
 
 const initialState: PostsSliceState = {
 	postItems: [],
@@ -35,33 +33,11 @@ const postsSlice = createSlice({
 		setCurrentPage: (state, action: PayloadAction<number>) => {
 			state.currentPage = action.payload;
 		},
-
-		setTotalNumPages: (state, action: PayloadAction<number>) => {
-			state.totalNumPages = action.payload;
-		},
 	},
 	extraReducers: builder => {
-		builder.addCase(getPosts.fulfilled, (state, action) => {
-			state.status = 'success';
-			state.postItems = action.payload.posts;
-			state.totalNumPages = action.payload.totalNumPages;
-		});
-
-		builder.addCase(getPostsBySearch.fulfilled, (state, action) => {
-			state.status = 'success';
-			state.postItems = action.payload.posts;
-			state.totalNumPages = action.payload.totalNumPages;
-		});
-
 		builder.addCase(getPost.fulfilled, (state, action) => {
 			state.status = 'success';
 			state.detailedPost = action.payload;
-		});
-
-		builder.addCase(createPost.fulfilled, (state, action) => {
-			state.status = 'success';
-			state.postItems = action.payload.posts;
-			state.totalNumPages = action.payload.totalNumPages;
 		});
 
 		// action.payload will be the post object containing the new comment
@@ -77,16 +53,20 @@ const postsSlice = createSlice({
 			state.detailedPost = action.payload;
 		});
 
-		builder.addCase(deletePost.fulfilled, (state, action) => {
-			state.status = 'success';
-			state.postItems = action.payload.posts;
-			state.totalNumPages = action.payload.totalNumPages;
-		});
-
 		builder.addMatcher(isPendingAction, state => {
 			state.status = 'pending';
 			state.error = '';
 		});
+
+		// this matcher matches all the fulfilled actions that result in a list of paginated posts (getPosts, getPostsBySearch, createPost, deletePost)
+		builder.addMatcher(
+			isPaginatedFulfilledAction,
+			(state, action: PayloadAction<PaginatedPostsResponse>) => {
+				state.status = 'success';
+				state.postItems = action.payload.posts;
+				state.totalNumPages = action.payload.totalNumPages;
+			}
+		);
 
 		// this matcher handles update fulfilled cases (both for actual post and post likes)
 		builder.addMatcher(isUpdateFulfilledAction, (state, action: PayloadAction<Post>) => {

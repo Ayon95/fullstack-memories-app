@@ -20,6 +20,20 @@ export function isRejectedAction(action: AnyAction): action is RejectedAction {
 	return action.type.endsWith('/rejected');
 }
 
+// matcher function that matches all actions that result in paginated posts
+export function isPaginatedFulfilledAction(action: AnyAction): action is FulfilledAction {
+	// action type that includes 'getPosts' and ends with 'fulfilled'
+	if (action.type.includes('getPosts') && action.type.endsWith('/fulfilled')) return true;
+	// action type that has either 'createPost' or 'deletePost' and ends with '/fulfilled'
+	if (
+		['createPost', 'deletePost'].some(str => action.type.includes(str)) &&
+		action.type.endsWith('/fulfilled')
+	) {
+		return true;
+	}
+	return false;
+}
+
 // matcher function that matches all actions whose type contains 'update' and ends with '/fulfilled'
 export function isUpdateFulfilledAction(action: AnyAction): action is FulfilledAction {
 	return action.type.includes('update') && action.type.endsWith('/fulfilled');
