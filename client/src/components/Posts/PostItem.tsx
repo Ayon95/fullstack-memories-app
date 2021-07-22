@@ -63,6 +63,11 @@ function PostItem({ post }: Props) {
 						<PostLikes>
 							{likeCount} {likeCount === 1 ? 'like' : 'likes'}
 						</PostLikes>
+						{post.comments.length > 0 && (
+							<PostComments>
+								{post.comments.length} {post.comments.length === 1 ? 'comment' : 'comments'}
+							</PostComments>
+						)}
 					</PostInfo>
 					<PostDescription>{getFormattedDescription(post.description)}</PostDescription>
 				</PostContent>
@@ -160,6 +165,10 @@ const PostDate = styled.p`
 `;
 
 const PostLikes = styled.p`
+	${detailsCommonStyle}
+`;
+
+const PostComments = styled.p`
 	${detailsCommonStyle}
 `;
 

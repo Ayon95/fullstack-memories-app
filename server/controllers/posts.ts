@@ -5,6 +5,7 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import Comment from '../models/Comment';
 import Post from '../models/Post';
 import config from '../utils/config';
+import { getPaginatedPosts } from '../utils/helpers';
 import { BasePost, GetPostParams, PostDoc, SearchQuery } from '../utils/types';
 
 export async function getPosts(
@@ -12,29 +13,10 @@ export async function getPosts(
 	response: Response
 ) {
 	const page = Number.parseFloat(request.query.page);
-	// the index of the very first item of the page
-	const startIndex = (page - 1) * config.POSTS_PER_PAGE;
 	try {
+		const posts = await getPaginatedPosts(page);
 		// getting the count of all posts
 		const total = await Post.countDocuments({});
-		// getting a specific number of posts starting from the start index (we don't want to get posts from previous pages)
-		// sorting the posts from newest to oldest
-		// populating the author field of each post with _id, firstName, and lastName
-		// populating the comments field, and the author field inside the comments field (nested populate)
-		const posts = await Post.find({})
-			.skip(startIndex)
-			.limit(config.POSTS_PER_PAGE)
-			.sort({ _id: -1 })
-			.populate([
-				{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-				{
-					path: 'comments',
-					populate: {
-						path: 'author',
-						select: { _id: 1, firstName: 1, lastName: 1 },
-					},
-				},
-			]);
 		response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
 	} catch (error) {
 		console.log(error);
@@ -64,16 +46,7 @@ export async function getPostsBySearch(
 				$or: [{ title: title }, { tags: { $in: tagsArray } }],
 			})
 				.sort({ _id: -1 })
-				.populate([
-					{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-					{
-						path: 'comments',
-						populate: {
-							path: 'author',
-							select: { _id: 1, firstName: 1, lastName: 1 },
-						},
-					},
-				]);
+				.populate(config.POST_POPULATE_OPTIONS);
 			return response.json({ posts: allPosts, totalNumPages: 0 });
 		}
 
@@ -90,13 +63,7 @@ export async function getPostsBySearch(
 			.skip(startIndex)
 			.limit(config.POSTS_PER_PAGE)
 			.sort({ _id: -1 })
-			.populate([
-				{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-				{
-					path: 'comments',
-					populate: { path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-				},
-			]);
+			.populate(config.POST_POPULATE_OPTIONS);
 
 		response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
 	} catch (error) {
@@ -108,13 +75,7 @@ export async function getPost(request: Request<GetPostParams>, response: Respons
 	const { id } = request.params;
 
 	try {
-		const post = await Post.findById(id).populate([
-			{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-			{
-				path: 'comments',
-				populate: { path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-			},
-		]);
+		const post = await Post.findById(id).populate(config.POST_POPULATE_OPTIONS);
 
 		if (!post) {
 			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
@@ -129,14 +90,12 @@ export async function getPost(request: Request<GetPostParams>, response: Respons
 export async function createPost(request: Request, response: Response) {
 	// if code reaches this point, then I know for sure that user will not be undefined
 	const user = request.user!;
-
 	try {
 		const post: BasePost = request.body;
 		// checking if a required field is missing or not
 		if (![post.title, post.description].every(Boolean)) {
 			return response.status(400).json({ errorMessage: 'A required field is missing' });
 		}
-
 		// creating a new post doc
 		const newPost = await Post.create({
 			...post,
@@ -145,34 +104,14 @@ export async function createPost(request: Request, response: Response) {
 			comments: [],
 			createdAt: new Date(),
 		});
-
 		// adding the post id to the posts array of the user
 		user.posts = [...user.posts, newPost._id];
-
 		// saving the user
 		await user.save();
-
 		// Need to send a list of paginated posts
-		// start index is 0 because the first page needs to be displayed (the newly-created post will be the very first post)
-		const startIndex = 0;
-		// getting the total number of posts
+		// page is 1 because the first page needs to be displayed (the newly-created post will be the very first post)
+		const posts = await getPaginatedPosts(1);
 		const total = await Post.countDocuments({});
-
-		const posts = await Post.find({})
-			.skip(startIndex)
-			.limit(config.POSTS_PER_PAGE)
-			.sort({ _id: -1 })
-			.populate([
-				{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-				{
-					path: 'comments',
-					populate: {
-						path: 'author',
-						select: { _id: 1, firstName: 1, lastName: 1 },
-					},
-				},
-			]);
-
 		response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
 	} catch (error) {
 		response.status(409).json({ errorMessage: error.message });
@@ -202,22 +141,13 @@ export async function addComment(
 			author: user._id,
 			createdAt: new Date(),
 		});
-
 		// adding the id of the new comment to the post's comments array
 		post.comments = [...post.comments, newComment._id];
-
 		// saving the post
 		await post.save();
-
 		// populating the author and comments fields of post
 		// inside each comment, we are populating the author field
-		await Post.populate(post, [
-			{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-			{
-				path: 'comments',
-				populate: { path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-			},
-		]);
+		await Post.populate(post, config.POST_POPULATE_OPTIONS);
 
 		response.status(201).json(post);
 	} catch (error) {
@@ -234,7 +164,6 @@ export async function updatePost(request: Request, response: Response) {
 		if (!postExists) {
 			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
 		}
-
 		// checking if a required field is missing
 		if (![post.title, post.description].every(Boolean)) {
 			return response.status(400).json({ errorMessage: 'A required field is missing' });
@@ -242,20 +171,10 @@ export async function updatePost(request: Request, response: Response) {
 		// updating the post doc
 		// if new is set to true, the updated document will be returned
 		const updatedPost = await Post.findByIdAndUpdate(id, post, { new: true });
-
 		// populating the author and comments fields of the updated post
-		await Post.populate(updatedPost, [
-			{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-			{
-				path: 'comments',
-				populate: { path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-			},
-		]);
+		await Post.populate(updatedPost, config.POST_POPULATE_OPTIONS);
 
-		// populating the comments field
-		await Post.populate(updatedPost, { path: 'comments' });
-
-		return response.json(updatedPost);
+		response.json(updatedPost);
 	} catch (error) {
 		return response.status(409).json({ errorMessage: error.message });
 	}
@@ -269,35 +188,25 @@ export async function updateLikes(request: Request, response: Response) {
 	if (!postExists) {
 		return response.status(404).json({ errorMessage: 'No post exists with the given id' });
 	}
-
 	// finding the post that the user wants to like or unlike
 	const post = (await Post.findById(id)) as PostDoc;
 
 	let updatedLikedBy: string[];
-
 	// checking if the user has already liked this post
 	// if so, then the user's id will be present in likedBy array
 	const postIsLiked = post.likedBy.includes(user._id);
-
 	// add the user's id if the user hasn't liked the post already
 	if (!postIsLiked) updatedLikedBy = [...post.likedBy, user._id];
 	// remove the user's id from the list if the user has already liked the post
 	else {
 		updatedLikedBy = post.likedBy.filter(userId => userId.toString() !== user._id.toString());
 	}
-
 	// updating only the likedBy field of the post
 	const updatedPost = await Post.findByIdAndUpdate(id, { likedBy: updatedLikedBy }, { new: true });
 
-	await Post.populate(updatedPost, [
-		{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-		{
-			path: 'comments',
-			populate: { path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-		},
-	]);
+	await Post.populate(updatedPost, config.POST_POPULATE_OPTIONS);
 
-	return response.json(updatedPost);
+	response.json(updatedPost);
 }
 
 export async function deletePost(
@@ -306,42 +215,21 @@ export async function deletePost(
 ) {
 	const user = request.user!;
 	const { id } = request.params;
-
 	// checking if any post with the id exists
 	const postExists = await Post.exists({ _id: id });
 
 	if (!postExists) {
 		return response.status(404).json({ errorMessage: 'No post exists with the given id' });
 	}
-
 	// deleting the post doc from the database
 	await Post.findByIdAndDelete(id);
-
 	// removing the post id from the user's posts array
 	user.posts = user.posts.filter(postId => postId !== id);
 	await user.save();
-
 	// Need to send a list of paginated posts
 	const page = Number.parseFloat(request.query.page);
-	const startIndex = (page - 1) * config.POSTS_PER_PAGE;
-	// getting the total number of posts
+	const posts = await getPaginatedPosts(page);
 	const total = await Post.countDocuments({});
 
-	const posts = await Post.find({})
-		.skip(startIndex)
-		.limit(config.POSTS_PER_PAGE)
-		.sort({ _id: -1 })
-		.populate([
-			{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
-			{
-				path: 'comments',
-				populate: {
-					path: 'author',
-					select: { _id: 1, firstName: 1, lastName: 1 },
-				},
-			},
-		]);
-
 	response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
-	response.status(204).end();
 }
