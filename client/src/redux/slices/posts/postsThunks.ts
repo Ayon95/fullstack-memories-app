@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { BasePost, ErrorObj, GetPostsResponse, Post } from '../../../utils/types';
+import { BasePost, ErrorObj, PaginatedPostsResponse, Post } from '../../../utils/types';
 
 const baseUrl = 'http://localhost:5000/posts';
 
@@ -10,7 +10,7 @@ Specified a few generic arguments because I need to use thunkAPI in the payload 
 - the third argument is an object that defines types for thunkAPI properties;
 here we are specifying the type of the value passed into rejectWithValue() */
 export const getPosts = createAsyncThunk<
-	GetPostsResponse,
+	PaginatedPostsResponse,
 	{ token: string; page: string },
 	{ rejectValue: string }
 >('posts/getPosts', async (requestData, thunkAPI) => {
@@ -26,7 +26,7 @@ export const getPosts = createAsyncThunk<
 	}
 	// the request was successful
 	// using type assertion to tell TS that the response data will be an array of Post objects
-	const data = (await response.json()) as GetPostsResponse;
+	const data = (await response.json()) as PaginatedPostsResponse;
 	return data;
 });
 
@@ -49,7 +49,7 @@ export const getPost = createAsyncThunk<
 
 // thunk creator responsible for sending a GET request to get posts based on the search query
 export const getPostsBySearch = createAsyncThunk<
-	GetPostsResponse,
+	PaginatedPostsResponse,
 	{ token: string; page: string; searchTerm: string; tags: string },
 	{ rejectValue: string }
 >('posts/getPostsBySearch', async (requestData, thunkAPI) => {
@@ -70,13 +70,13 @@ export const getPostsBySearch = createAsyncThunk<
 		return thunkAPI.rejectWithValue(error.errorMessage);
 	}
 
-	const data = (await response.json()) as GetPostsResponse;
+	const data = (await response.json()) as PaginatedPostsResponse;
 	return data;
 });
 
 // thunk creator responsible for sending a POST request to add a new post
 export const createPost = createAsyncThunk<
-	Post,
+	PaginatedPostsResponse,
 	{ token: string; post: BasePost },
 	{ rejectValue: string }
 >('posts/createPost', async (requestData, thunkAPI) => {
@@ -91,7 +91,8 @@ export const createPost = createAsyncThunk<
 		return thunkAPI.rejectWithValue(error.errorMessage);
 	}
 
-	const data = (await response.json()) as Post;
+	// expecting to get a list of paginated posts and totalNumPages
+	const data = (await response.json()) as PaginatedPostsResponse;
 	return data;
 });
 
@@ -167,11 +168,11 @@ export const addComment = createAsyncThunk<
 
 // thunk creator responsible for sending a DELETE request to delete a specific post
 export const deletePost = createAsyncThunk<
-	string,
-	{ id: string; token: string },
+	PaginatedPostsResponse,
+	{ id: string; token: string; page: string },
 	{ rejectValue: string }
 >('posts/deletePost', async (requestData, thunkAPI) => {
-	const response = await fetch(`${baseUrl}/${requestData.id}`, {
+	const response = await fetch(`${baseUrl}/${requestData.id}?page=${requestData.page}`, {
 		method: 'DELETE',
 		headers: { Authorization: `Bearer ${requestData.token}` },
 	});
@@ -181,6 +182,6 @@ export const deletePost = createAsyncThunk<
 		return thunkAPI.rejectWithValue(error.errorMessage);
 	}
 
-	// return the id of the deleted post as payload because we will need it to remove that post from the postItems array
-	return requestData.id;
+	const data = (await response.json()) as PaginatedPostsResponse;
+	return data;
 });

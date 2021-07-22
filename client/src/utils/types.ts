@@ -62,7 +62,7 @@ export type PostsSliceState = {
 };
 
 // shape of the response body for the request to get posts
-export type GetPostsResponse = {
+export type PaginatedPostsResponse = {
 	posts: Post[];
 	totalNumPages: number;
 };

@@ -35,6 +35,10 @@ const postsSlice = createSlice({
 		setCurrentPage: (state, action: PayloadAction<number>) => {
 			state.currentPage = action.payload;
 		},
+
+		setTotalNumPages: (state, action: PayloadAction<number>) => {
+			state.totalNumPages = action.payload;
+		},
 	},
 	extraReducers: builder => {
 		builder.addCase(getPosts.fulfilled, (state, action) => {
@@ -56,7 +60,8 @@ const postsSlice = createSlice({
 
 		builder.addCase(createPost.fulfilled, (state, action) => {
 			state.status = 'success';
-			state.postItems.push(action.payload);
+			state.postItems = action.payload.posts;
+			state.totalNumPages = action.payload.totalNumPages;
 		});
 
 		// action.payload will be the post object containing the new comment
@@ -74,8 +79,8 @@ const postsSlice = createSlice({
 
 		builder.addCase(deletePost.fulfilled, (state, action) => {
 			state.status = 'success';
-			const updatedPostsList = state.postItems.filter(post => post._id !== action.payload);
-			state.postItems = updatedPostsList;
+			state.postItems = action.payload.posts;
+			state.totalNumPages = action.payload.totalNumPages;
 		});
 
 		builder.addMatcher(isPendingAction, state => {

@@ -8,6 +8,7 @@ import LoadingSpinner from '../Generic/LoadingSpinner';
 function Posts() {
 	const posts = useSelector((state: RootState) => state.posts.postItems);
 	const postsStatus = useSelector((state: RootState) => state.posts.status);
+
 	if (posts.length === 0 && postsStatus !== 'pending') {
 		return (
 			<NoPostsContainer>

@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import Comment from '../models/Comment';
 import Post from '../models/Post';
+import config from '../utils/config';
 import { BasePost, GetPostParams, PostDoc, SearchQuery } from '../utils/types';
 
 export async function getPosts(
@@ -11,19 +12,18 @@ export async function getPosts(
 	response: Response
 ) {
 	const page = Number.parseFloat(request.query.page);
-	// want to have 6 posts per page
-	const limit = 6;
 	// the index of the very first item of the page
-	const startIndex = (page - 1) * limit;
+	const startIndex = (page - 1) * config.POSTS_PER_PAGE;
 	try {
 		// getting the count of all posts
 		const total = await Post.countDocuments({});
 		// getting a specific number of posts starting from the start index (we don't want to get posts from previous pages)
 		// sorting the posts from newest to oldest
-		// also populating the author field of each post with _id, firstName, and lastName
+		// populating the author field of each post with _id, firstName, and lastName
+		// populating the comments field, and the author field inside the comments field (nested populate)
 		const posts = await Post.find({})
 			.skip(startIndex)
-			.limit(limit)
+			.limit(config.POSTS_PER_PAGE)
 			.sort({ _id: -1 })
 			.populate([
 				{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
@@ -35,7 +35,7 @@ export async function getPosts(
 					},
 				},
 			]);
-		response.json({ posts, totalNumPages: Math.ceil(total / limit) });
+		response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
 	} catch (error) {
 		console.log(error);
 		response.status(404).json({ errorMessage: 'The requested url does not exist' });
@@ -77,9 +77,7 @@ export async function getPostsBySearch(
 			return response.json({ posts: allPosts, totalNumPages: 0 });
 		}
 
-		// the number of posts to display per page
-		const limit = 6;
-		const startIndex = (Number.parseFloat(page) - 1) * limit;
+		const startIndex = (Number.parseFloat(page) - 1) * config.POSTS_PER_PAGE;
 		// getting the total number of search results
 		const total = await Post.countDocuments({
 			$or: [{ title: title }, { tags: { $in: tagsArray } }],
@@ -90,7 +88,7 @@ export async function getPostsBySearch(
 			$or: [{ title: title }, { tags: { $in: tagsArray } }],
 		})
 			.skip(startIndex)
-			.limit(limit)
+			.limit(config.POSTS_PER_PAGE)
 			.sort({ _id: -1 })
 			.populate([
 				{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
@@ -100,7 +98,7 @@ export async function getPostsBySearch(
 				},
 			]);
 
-		response.json({ posts, totalNumPages: Math.ceil(total / limit) });
+		response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
 	} catch (error) {
 		response.status(404).json({ errorMessage: error.message });
 	}
@@ -148,19 +146,34 @@ export async function createPost(request: Request, response: Response) {
 			createdAt: new Date(),
 		});
 
-		// populating the author field of the newly-created post
-		await Post.populate(newPost, {
-			path: 'author',
-			select: { _id: 1, firstName: 1, lastName: 1 },
-		});
-
 		// adding the post id to the posts array of the user
 		user.posts = [...user.posts, newPost._id];
 
 		// saving the user
 		await user.save();
 
-		response.status(201).json(newPost);
+		// Need to send a list of paginated posts
+		// start index is 0 because the first page needs to be displayed (the newly-created post will be the very first post)
+		const startIndex = 0;
+		// getting the total number of posts
+		const total = await Post.countDocuments({});
+
+		const posts = await Post.find({})
+			.skip(startIndex)
+			.limit(config.POSTS_PER_PAGE)
+			.sort({ _id: -1 })
+			.populate([
+				{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+				{
+					path: 'comments',
+					populate: {
+						path: 'author',
+						select: { _id: 1, firstName: 1, lastName: 1 },
+					},
+				},
+			]);
+
+		response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
 	} catch (error) {
 		response.status(409).json({ errorMessage: error.message });
 	}
@@ -287,7 +300,10 @@ export async function updateLikes(request: Request, response: Response) {
 	return response.json(updatedPost);
 }
 
-export async function deletePost(request: Request, response: Response) {
+export async function deletePost(
+	request: Request<ParamsDictionary, any, any, { page: string }>,
+	response: Response
+) {
 	const user = request.user!;
 	const { id } = request.params;
 
@@ -304,5 +320,28 @@ export async function deletePost(request: Request, response: Response) {
 	// removing the post id from the user's posts array
 	user.posts = user.posts.filter(postId => postId !== id);
 	await user.save();
+
+	// Need to send a list of paginated posts
+	const page = Number.parseFloat(request.query.page);
+	const startIndex = (page - 1) * config.POSTS_PER_PAGE;
+	// getting the total number of posts
+	const total = await Post.countDocuments({});
+
+	const posts = await Post.find({})
+		.skip(startIndex)
+		.limit(config.POSTS_PER_PAGE)
+		.sort({ _id: -1 })
+		.populate([
+			{ path: 'author', select: { _id: 1, firstName: 1, lastName: 1 } },
+			{
+				path: 'comments',
+				populate: {
+					path: 'author',
+					select: { _id: 1, firstName: 1, lastName: 1 },
+				},
+			},
+		]);
+
+	response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
 	response.status(204).end();
 }

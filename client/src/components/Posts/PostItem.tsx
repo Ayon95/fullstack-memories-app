@@ -1,40 +1,37 @@
 import { formatDistanceToNow } from 'date-fns';
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Post, User } from '../../utils/types';
 import { FaTrashAlt, FaEdit, FaThumbsDown, FaRegThumbsUp } from 'react-icons/fa';
 import stylesConfig from '../../utils/stylesConfig';
 import { useDispatch, useSelector } from 'react-redux';
 import { postsActions } from '../../redux/slices/posts/postsSlice';
-import { useState } from 'react';
 import { deletePost, updateLikes } from './../../redux/slices/posts/postsThunks';
 import IconTextButton from '../Generic/IconTextButton';
 import { RootState } from '../../redux/store';
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getAuthorName } from '../../utils/helpers';
 
 type Props = { post: Post };
 
 function PostItem({ post }: Props) {
-	const [isLiked, setIsLiked] = useState(false);
-	const dispatch = useDispatch();
 	const currentUser = useSelector((state: RootState) => state.auth.user) as User;
+	const { postItems: posts, currentPage } = useSelector((state: RootState) => state.posts);
+	const dispatch = useDispatch();
 	const likeCount = post.likedBy.length;
 
-	// check if the post is already liked by the current user
-	useEffect(() => {
-		if (post.likedBy.includes(currentUser.userId)) {
-			setIsLiked(true);
-		}
-	}, [currentUser, post]);
+	const [isLiked, setIsLiked] = useState(post.likedBy.includes(currentUser.userId));
 
 	function handleClickEdit() {
 		dispatch(postsActions.setCurrentPostId(post._id));
 	}
 
 	function handleClickDelete() {
-		dispatch(deletePost({ id: post._id, token: currentUser.token }));
+		let page = currentPage;
+		// suppose the user is on the 2nd page which only has one post and the user deleted that post
+		// then current page should be -> 2 - 1 = 1
+		if (currentPage > 1 && posts.length === 1) page = currentPage - 1;
+		dispatch(deletePost({ id: post._id, token: currentUser.token, page: page.toString() }));
 	}
 
 	function handleClickLike() {
