@@ -4,6 +4,7 @@ import Post from './PostItem';
 import { RootState } from '../../redux/store';
 import styled from 'styled-components';
 import LoadingSpinner from '../Generic/LoadingSpinner';
+import stylesConfig from '../../utils/stylesConfig';
 
 function Posts() {
 	const posts = useSelector((state: RootState) => state.posts.postItems);
@@ -31,6 +32,19 @@ const PostsContainer = styled.section`
 	grid-template-columns: repeat(3, 1fr);
 	gap: 2rem;
 	margin-right: 2rem;
+
+	@media only screen and (max-width: ${stylesConfig.bpLarge}) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	@media only screen and (max-width: ${stylesConfig.bpMedium}) {
+		margin-right: 0;
+		margin-top: 2rem;
+	}
+
+	@media only screen and (max-width: ${stylesConfig.bpSmall}) {
+		grid-template-columns: 1fr;
+	}
 `;
 
 const NoPostsContainer = styled.section`

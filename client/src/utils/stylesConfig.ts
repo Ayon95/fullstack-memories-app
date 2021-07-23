@@ -16,6 +16,17 @@ const stylesConfig = {
 	colorBlack: 'hsl(0, 0%, 7.5%)',
 
 	inputFocusStyle: '0 0 0 1px rgb(16, 80, 183)',
+
+	// 1800px
+	bpExtraLarge: '112.5em',
+	// 1200px
+	bpLarge: '75em',
+	// 850px
+	bpMedium: '53.12em',
+	// 550px
+	bpSmall: '34.4em',
+	// 350px
+	bpExtraSmall: '21.8em',
 };
 
 export default stylesConfig;

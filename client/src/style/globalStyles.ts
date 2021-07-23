@@ -13,6 +13,23 @@ const GlobalStyles = createGlobalStyle`
     html {
         font-size: 62.5%;
         box-sizing: border-box;
+
+        @media only screen and (min-width: ${stylesConfig.bpExtraLarge}) {
+		font-size: 80%;
+	}
+
+        @media only screen and (max-width: ${stylesConfig.bpLarge}) {
+            font-size: 52%;
+        }
+
+        @media only screen and (max-width: ${stylesConfig.bpSmall}) {
+		    font-size: 45%;
+	    }
+
+        @media only screen and (max-width: ${stylesConfig.bpExtraSmall}) {
+		    font-size: 40%;
+	    }
+
     }
 
     body {

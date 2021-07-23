@@ -8,6 +8,7 @@ import Layout from '../components/Layout/Layout';
 import { RootState } from '../redux/store';
 import SearchForm from '../components/Forms/SearchForm';
 import Pagination from '../components/Pagination/Pagination';
+import stylesConfig from '../utils/stylesConfig';
 
 function Home() {
 	const dispatch = useDispatch();
@@ -36,6 +37,20 @@ export default Home;
 
 const HomeContainer = styled.main`
 	display: flex;
+
+	@media only screen and (max-width: ${stylesConfig.bpLarge}) {
+		justify-content: space-between;
+	}
+
+	@media only screen and (max-width: ${stylesConfig.bpMedium}) {
+		align-items: center;
+		flex-direction: column;
+		flex-flow: column-reverse;
+	}
 `;
 
-const FormsContainer = styled.div``;
+const FormsContainer = styled.div`
+	@media only screen and (max-width: ${stylesConfig.bpExtraSmall}) {
+		max-width: 100%;
+	}
+`;
