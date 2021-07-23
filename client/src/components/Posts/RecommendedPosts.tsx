@@ -46,7 +46,9 @@ const RecommendedPostsContainer = styled.div`
 
 const RecommendedPostsList = styled.ul`
 	list-style: none;
-	display: flex;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 25ch);
+	gap: 2rem;
 `;
 
 const LinkWrapper = styled(Link)`
@@ -54,13 +56,7 @@ const LinkWrapper = styled(Link)`
 	color: ${stylesConfig.colorBlack};
 `;
 
-const RecommendedPost = styled.li`
-	max-width: 25ch;
-
-	:not(:last-child) {
-		margin-right: 2rem;
-	}
-`;
+const RecommendedPost = styled.li``;
 
 const Author = styled.p`
 	span {
@@ -75,5 +71,7 @@ const PostDescription = styled.p`
 
 const PostImage = styled.img`
 	width: 100%;
+	height: 15rem;
+	object-fit: cover;
 	border-radius: 0.5rem;
 `;

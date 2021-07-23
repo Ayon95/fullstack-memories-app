@@ -123,8 +123,8 @@ const PostDetailsLink = styled(Link)`
 `;
 
 const PostWrapper = styled.article`
-	width: 100%;
-	max-width: 35rem;
+	/* width: 100%;
+	max-width: 35rem; */
 	border-radius: 1rem;
 	overflow: hidden;
 	box-shadow: ${stylesConfig.shadowThin};
@@ -134,9 +134,8 @@ const PostWrapper = styled.article`
 
 const PostImage = styled.img`
 	width: 100%;
-	height: 25rem;
+	height: 20rem;
 	object-fit: cover;
-	/* object-position: 50% 80%; */
 `;
 
 const PostContent = styled.div`

@@ -43,13 +43,15 @@ const HomeContainer = styled.main`
 	}
 
 	@media only screen and (max-width: ${stylesConfig.bpMedium}) {
-		align-items: center;
 		flex-direction: column;
 		flex-flow: column-reverse;
 	}
 `;
 
 const FormsContainer = styled.div`
+	@media only screen and (max-width: ${stylesConfig.bpMedium}) {
+		align-self: center;
+	}
 	@media only screen and (max-width: ${stylesConfig.bpExtraSmall}) {
 		max-width: 100%;
 	}

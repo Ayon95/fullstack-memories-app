@@ -87,6 +87,11 @@ const PostDetailsContainer = styled.main`
 	border-radius: 0.5rem;
 	display: flex;
 	justify-content: space-between;
+
+	@media only screen and (max-width: ${stylesConfig.bpMedium}) {
+		flex-direction: column;
+		flex-flow: column-reverse;
+	}
 `;
 const PostImage = styled.img`
 	border-radius: 0.5rem;
@@ -95,6 +100,12 @@ const PostImage = styled.img`
 	max-width: 64rem;
 	max-height: 40rem;
 	object-fit: cover;
+
+	@media only screen and (max-width: ${stylesConfig.bpMedium}) {
+		margin-bottom: 1rem;
+		width: 100%;
+		max-width: none;
+	}
 `;
 const TextContent = styled.div`
 	width: 100%;
