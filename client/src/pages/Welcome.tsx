@@ -61,6 +61,11 @@ const WelcomeContent = styled.main`
 	max-width: 90rem;
 	display: flex;
 	justify-content: space-between;
+
+	@media only screen and (max-width: ${stylesConfig.bpMedium}) {
+		flex-direction: column;
+		align-items: center;
+	}
 `;
 const BrandIntro = styled.div`
 	h1 {
@@ -73,5 +78,13 @@ const BrandIntro = styled.div`
 		font-size: 2rem;
 		color: ${stylesConfig.colorGrey3};
 		margin-bottom: 4rem;
+
+		@media only screen and (max-width: ${stylesConfig.bpMedium}) {
+			margin-bottom: 2rem;
+		}
+	}
+
+	@media only screen and (max-width: ${stylesConfig.bpMedium}) {
+		margin-bottom: 6rem;
 	}
 `;
