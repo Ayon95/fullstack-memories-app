@@ -1,11 +1,13 @@
 import React from 'react';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { signUp } from '../../redux/slices/auth/authThunks';
+import { RootState } from '../../redux/store';
 import { UserRequestBody } from '../../utils/types';
 import Button from '../Generic/Button';
+import ErrorMessage from '../Generic/ErrorMessage';
 import FormWrapper from './FormWrapper';
 import Input from './Input';
 
@@ -19,6 +21,8 @@ function SignupForm({ closeModal }: Props) {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
+	const [validationError, setValidationError] = useState('');
+	const error = useSelector((state: RootState) => state.auth.error);
 
 	const dispatch = useDispatch();
 	const history = useHistory();
@@ -26,11 +30,11 @@ function SignupForm({ closeModal }: Props) {
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		if (![firstName, lastName, email, password, confirmPassword].every(Boolean)) {
-			return console.log('a required field for signup is missing');
+			return setValidationError('A required field is missing');
 		}
 
 		if (confirmPassword !== password) {
-			return console.log('passwords do not match');
+			return setValidationError('Passwords do not match');
 		}
 
 		const userData: UserRequestBody = { firstName, lastName, email, password };
@@ -89,6 +93,9 @@ function SignupForm({ closeModal }: Props) {
 				value={confirmPassword}
 				setValue={setConfirmPassword}
 			/>
+
+			{error && <ErrorMessage text={error} />}
+			{validationError && <ErrorMessage text={validationError} />}
 
 			<Button
 				text="Sign Up"

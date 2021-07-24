@@ -6,6 +6,7 @@ import { getPosts, getPostsBySearch } from '../../redux/slices/posts/postsThunks
 import { RootState } from '../../redux/store';
 import stylesConfig from '../../utils/stylesConfig';
 import Button from '../Generic/Button';
+import ErrorMessage from '../Generic/ErrorMessage';
 import ChipInput from './ChipInput';
 import FormWrapper from './FormWrapper';
 import Input from './Input';
@@ -13,7 +14,9 @@ import Input from './Input';
 function SearchForm() {
 	const [title, setTittle] = useState('');
 	const [tags, setTags] = useState<string[]>([]);
+	const [validationError, setValidationError] = useState('');
 
+	const error = useSelector((state: RootState) => state.posts.error);
 	const status = useSelector((state: RootState) => state.posts.status);
 	const token = useSelector((state: RootState) => state.auth.user!.token);
 	const posts = useSelector((state: RootState) => state.posts.postItems);
@@ -26,7 +29,8 @@ function SearchForm() {
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		// if neither a title nor tags are provided then simply return
-		if (!title && tags.length === 0) return;
+		if (!title && tags.length === 0)
+			return setValidationError('Neither a title nor a tag was provided');
 		dispatch(
 			getPostsBySearch({
 				token,
@@ -57,6 +61,9 @@ function SearchForm() {
 			/>
 
 			<ChipInput name="tags" label="Tags" chips={tags} setChips={setTags} />
+
+			{error && <ErrorMessage text={error} />}
+			{validationError && <ErrorMessage text={validationError} />}
 
 			<div>
 				<Button

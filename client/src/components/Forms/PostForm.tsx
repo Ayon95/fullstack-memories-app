@@ -9,14 +9,17 @@ import { createPost, updatePost } from '../../redux/slices/posts/postsThunks';
 import { useEffect } from 'react';
 import Button from '../Generic/Button';
 import FormWrapper from './FormWrapper';
+import ErrorMessage from '../Generic/ErrorMessage';
 
 function Form() {
 	const [title, setTittle] = useState('');
 	const [description, setDescription] = useState('');
 	const [tags, setTags] = useState('');
+	const [validationError, setValidationError] = useState('');
 	// the image file will be converted to a base-64 string
 	const [selectedFile, setSelectedFile] = useState('');
 
+	const error = useSelector((state: RootState) => state.posts.error);
 	const status = useSelector((state: RootState) => state.posts.status);
 	const token = useSelector((state: RootState) => state.auth.user!.token);
 	const currentPostId = useSelector((state: RootState) => state.posts.currentPostId);
@@ -56,7 +59,7 @@ function Form() {
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		const canSubmit = [title, description, tags, selectedFile].every(Boolean);
-		if (!canSubmit) return console.log('A required field is missing');
+		if (!canSubmit) return setValidationError('A required field is missing');
 		const post: BasePost = { title, description, selectedFile, tags: tags.split(',') };
 		// need to update post if there is a current post id
 		if (currentPostId) {
@@ -106,6 +109,9 @@ function Form() {
 				accept=".jpeg, .jpg, .png"
 				onChange={handleChangeFile}
 			/>
+
+			{error && <ErrorMessage text={error} />}
+			{validationError && <ErrorMessage text={validationError} />}
 
 			<Button
 				text="Submit"

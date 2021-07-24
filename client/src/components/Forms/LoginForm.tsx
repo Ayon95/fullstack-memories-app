@@ -5,12 +5,16 @@ import FormWrapper from './FormWrapper';
 import Input from './Input';
 import { GoogleLogin, GoogleLoginResponse, GoogleLoginResponseOffline } from 'react-google-login';
 import { GoogleLoginFailedResponse } from '../../utils/types';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logIn, logInGoogle } from '../../redux/slices/auth/authThunks';
+import { RootState } from '../../redux/store';
+import ErrorMessage from '../Generic/ErrorMessage';
 
 function LoginForm() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [validationError, setValidationError] = useState('');
+	const error = useSelector((state: RootState) => state.auth.error);
 
 	const dispatch = useDispatch();
 
@@ -18,7 +22,7 @@ function LoginForm() {
 		e.preventDefault();
 
 		if (![email, password].every(Boolean)) {
-			return console.log('email or password is missing for login');
+			return setValidationError('email or password is missing');
 		}
 		// dispatch action to log the user in
 		dispatch(logIn({ email, password }));
@@ -55,6 +59,9 @@ function LoginForm() {
 				value={password}
 				setValue={setPassword}
 			/>
+
+			{error && <ErrorMessage text={error} />}
+			{validationError && <ErrorMessage text={validationError} />}
 
 			<Button
 				text="Log In"

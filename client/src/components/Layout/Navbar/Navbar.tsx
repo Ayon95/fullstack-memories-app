@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { authActions } from '../../../redux/slices/auth/authSlice';
 import { logoutTimerId } from '../../../redux/slices/auth/authThunks';
+import { postsActions } from '../../../redux/slices/posts/postsSlice';
 import { RootState } from '../../../redux/store';
 import stylesConfig from '../../../utils/stylesConfig';
 import Button from '../../Generic/Button';
@@ -16,11 +17,12 @@ function Navbar() {
 	function handleClickLogout() {
 		// clearing the logout timer
 		clearTimeout(logoutTimerId);
-		console.log('logout timer cleared');
 		// remove user from local storage
 		localStorage.removeItem('memoriesUser');
 		// remove user from redux store
 		dispatch(authActions.removeUser());
+		// set the page back to 1
+		dispatch(postsActions.setCurrentPage(1));
 		// redirect user to Welcome page
 		history.push('/');
 	}

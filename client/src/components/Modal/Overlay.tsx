@@ -10,6 +10,9 @@ function Overlay({ children }: Props) {
 export default Overlay;
 
 const Container = styled.div`
+	padding: 1rem;
+	width: 100%;
+	max-width: 45rem;
 	position: fixed;
 	top: 50%;
 	left: 50%;
