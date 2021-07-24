@@ -48,6 +48,12 @@ export function checkExpiredToken(token: string) {
 	return decodedToken.exp! * 1000 < Date.now();
 }
 
+// this function will log the user out
+export function logOut(dispatch: Dispatch<any>) {
+	localStorage.removeItem('memoriesUser');
+	dispatch(authActions.removeUser());
+}
+
 // this function will calculate the time after which the user's token will expire and set a timer
 // the user will be logged out when the timer finishes countdown
 export function startLogoutTimer(timerId: number, dispatch: Dispatch<any>, token: string) {
@@ -55,11 +61,10 @@ export function startLogoutTimer(timerId: number, dispatch: Dispatch<any>, token
 	// calculating the remaining time - the token will expire after this remaining time
 	// the remaining time is equal to the difference between some time in the future (expirationTime) and the current time
 	const remainingTime = decodedToken.exp! * 1000 - Date.now();
-	// the timer will finish its countdown after this remainingTime
-	timerId = window.setTimeout(() => {
-		localStorage.removeItem('memoriesUser');
-		dispatch(authActions.removeUser());
-	}, remainingTime);
+	console.log('remaining time', remainingTime / 1000);
+	console.log('logout timer started');
+	// the timer will finish its countdown after this remainingTime, and the user will be logged out
+	timerId = window.setTimeout(() => logOut(dispatch), remainingTime);
 }
 
 export function getFormattedAuthorName(post: Post | CommentObj, currentUser: User) {

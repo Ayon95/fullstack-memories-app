@@ -123,8 +123,6 @@ const PostDetailsLink = styled(Link)`
 `;
 
 const PostWrapper = styled.article`
-	/* width: 100%;
-	max-width: 35rem; */
 	border-radius: 1rem;
 	overflow: hidden;
 	box-shadow: ${stylesConfig.shadowThin};
