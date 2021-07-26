@@ -9,6 +9,7 @@ import { checkExpiredToken, logOut, startLogoutTimer } from './utils/helpers';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './redux/store';
 import { logoutTimerId } from './redux/slices/auth/authThunks';
+import NotFound from './pages/NotFound';
 
 function App() {
 	const dispatch = useDispatch();
@@ -35,6 +36,9 @@ function App() {
 					<ProtectedRoute exact={true} path="/home" component={Home} />
 					<ProtectedRoute path="/home/search" component={Home} />
 					<ProtectedRoute path="/posts/:id" component={PostDetails} />
+					<Route path="*">
+						<NotFound />
+					</Route>
 				</Switch>
 			</Router>
 		</>
