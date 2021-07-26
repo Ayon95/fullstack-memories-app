@@ -5,6 +5,7 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import Comment from '../models/Comment';
 import Post from '../models/Post';
 import config from '../utils/config';
+import { NonexistentPostError, RequiredFieldError } from '../utils/error';
 import { getPaginatedPosts } from '../utils/helpers';
 import { BasePost, GetPostParams, PostDoc, SearchQuery } from '../utils/types';
 
@@ -83,7 +84,7 @@ export async function getPost(
 		const post = await Post.findById(id).populate(config.POST_POPULATE_OPTIONS);
 
 		if (!post) {
-			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+			throw new NonexistentPostError();
 		}
 
 		return response.json(post);
@@ -99,7 +100,7 @@ export async function createPost(request: Request, response: Response, next: Nex
 		const post: BasePost = request.body;
 		// checking if a required field is missing or not
 		if (![post.title, post.description].every(Boolean)) {
-			return response.status(400).json({ errorMessage: 'A required field is missing' });
+			throw new RequiredFieldError();
 		}
 		// creating a new post doc
 		const newPost = await Post.create({
@@ -132,13 +133,13 @@ export async function addComment(
 	const user = request.user!;
 
 	if (!request.body.comment) {
-		return response.status(400).json({ errorMessage: 'A required field is missing' });
+		throw new RequiredFieldError();
 	}
 
 	try {
 		const post = await Post.findById(id);
 		if (!post) {
-			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+			throw new NonexistentPostError();
 		}
 
 		const newComment = await Comment.create({
@@ -168,11 +169,11 @@ export async function updatePost(request: Request, response: Response, next: Nex
 		// checking if any post exists with the given id
 		const postExists = await Post.exists({ _id: id });
 		if (!postExists) {
-			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+			throw new NonexistentPostError();
 		}
 		// checking if a required field is missing
 		if (![post.title, post.description].every(Boolean)) {
-			return response.status(400).json({ errorMessage: 'A required field is missing' });
+			throw new RequiredFieldError();
 		}
 		// updating the post doc
 		// if new is set to true, the updated document will be returned
@@ -193,7 +194,7 @@ export async function updateLikes(request: Request, response: Response, next: Ne
 		// checking whether the post exists or not
 		const postExists = await Post.exists({ _id: id });
 		if (!postExists) {
-			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+			throw new NonexistentPostError();
 		}
 		// finding the post that the user wants to like or unlike
 		const post = (await Post.findById(id)) as PostDoc;
@@ -235,7 +236,7 @@ export async function deletePost(
 		const postExists = await Post.exists({ _id: id });
 
 		if (!postExists) {
-			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+			throw new NonexistentPostError();
 		}
 		// deleting the post doc from the database
 		await Post.findByIdAndDelete(id);

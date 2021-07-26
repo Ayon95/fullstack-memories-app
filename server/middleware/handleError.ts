@@ -2,6 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 
 function handleError(error: Error, request: Request, response: Response, next: NextFunction) {
 	console.log(error.stack);
+	// handling error that is thrown when a required field is missing
+	if (error.name === 'RequiredFieldError') {
+		return response.status(400).json({ errorMessage: error.message });
+	}
+	// handling error that is thrown when the requested post could not be found
+	if (error.name === 'NonexistentPostError') {
+		return response.status(404).json({ errorMessage: error.message });
+	}
 	// handling CastError exceptions caused by invalid id for mongo documents
 	if (error.name === 'CastError') {
 		return response.status(400).json({ errorMessage: 'Invalid id provided' });

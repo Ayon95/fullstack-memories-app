@@ -1,4 +1,4 @@
-PUT http://localhost:5000/posts/60e91d41b279aa3644a97199
+PATCH  http://localhost:5000/posts/60e91d41b279aa3644a97199
 Content-Type: application/json
 
 {
