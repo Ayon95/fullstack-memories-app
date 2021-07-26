@@ -1,6 +1,6 @@
 // This file contains all the handlers for post-related routes
 
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import Comment from '../models/Comment';
 import Post from '../models/Post';
@@ -10,7 +10,8 @@ import { BasePost, GetPostParams, PostDoc, SearchQuery } from '../utils/types';
 
 export async function getPosts(
 	request: Request<ParamsDictionary, any, any, { page: string }>,
-	response: Response
+	response: Response,
+	next: NextFunction
 ) {
 	const page = Number.parseFloat(request.query.page);
 	try {
@@ -19,14 +20,14 @@ export async function getPosts(
 		const total = await Post.countDocuments({});
 		response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
 	} catch (error) {
-		console.log(error);
-		response.status(404).json({ errorMessage: 'The requested url does not exist' });
+		next(error);
 	}
 }
 
 export async function getPostsBySearch(
 	request: Request<ParamsDictionary, any, any, SearchQuery>,
-	response: Response
+	response: Response,
+	next: NextFunction
 ) {
 	try {
 		// getting the query params
@@ -67,11 +68,15 @@ export async function getPostsBySearch(
 
 		response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
 	} catch (error) {
-		response.status(404).json({ errorMessage: error.message });
+		next(error);
 	}
 }
 
-export async function getPost(request: Request<GetPostParams>, response: Response) {
+export async function getPost(
+	request: Request<GetPostParams>,
+	response: Response,
+	next: NextFunction
+) {
 	const { id } = request.params;
 
 	try {
@@ -83,11 +88,11 @@ export async function getPost(request: Request<GetPostParams>, response: Respons
 
 		return response.json(post);
 	} catch (error) {
-		response.status(404).json({ errorMessage: error.message });
+		next(error);
 	}
 }
 
-export async function createPost(request: Request, response: Response) {
+export async function createPost(request: Request, response: Response, next: NextFunction) {
 	// if code reaches this point, then I know for sure that user will not be undefined
 	const user = request.user!;
 	try {
@@ -114,13 +119,14 @@ export async function createPost(request: Request, response: Response) {
 		const total = await Post.countDocuments({});
 		response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
 	} catch (error) {
-		response.status(409).json({ errorMessage: error.message });
+		next(error);
 	}
 }
 
 export async function addComment(
 	request: Request<ParamsDictionary, any, { comment: string }>,
-	response: Response
+	response: Response,
+	next: NextFunction
 ) {
 	const { id } = request.params;
 	const user = request.user!;
@@ -151,11 +157,11 @@ export async function addComment(
 
 		response.status(201).json(post);
 	} catch (error) {
-		response.status(409).json({ errorMessage: error.message });
+		next(error);
 	}
 }
 
-export async function updatePost(request: Request, response: Response) {
+export async function updatePost(request: Request, response: Response, next: NextFunction) {
 	const { id } = request.params;
 	const post: BasePost = request.body;
 	try {
@@ -176,60 +182,73 @@ export async function updatePost(request: Request, response: Response) {
 
 		response.json(updatedPost);
 	} catch (error) {
-		return response.status(409).json({ errorMessage: error.message });
+		next(error);
 	}
 }
 
-export async function updateLikes(request: Request, response: Response) {
+export async function updateLikes(request: Request, response: Response, next: NextFunction) {
 	const { id } = request.params;
 	const user = request.user!;
-	// checking whether the post exists or not
-	const postExists = await Post.exists({ _id: id });
-	if (!postExists) {
-		return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+	try {
+		// checking whether the post exists or not
+		const postExists = await Post.exists({ _id: id });
+		if (!postExists) {
+			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+		}
+		// finding the post that the user wants to like or unlike
+		const post = (await Post.findById(id)) as PostDoc;
+
+		let updatedLikedBy: string[];
+		// checking if the user has already liked this post
+		// if so, then the user's id will be present in likedBy array
+		const postIsLiked = post.likedBy.includes(user._id);
+		// add the user's id if the user hasn't liked the post already
+		if (!postIsLiked) updatedLikedBy = [...post.likedBy, user._id];
+		// remove the user's id from the list if the user has already liked the post
+		else {
+			updatedLikedBy = post.likedBy.filter(userId => userId.toString() !== user._id.toString());
+		}
+		// updating only the likedBy field of the post
+		const updatedPost = await Post.findByIdAndUpdate(
+			id,
+			{ likedBy: updatedLikedBy },
+			{ new: true }
+		);
+
+		await Post.populate(updatedPost, config.POST_POPULATE_OPTIONS);
+
+		response.json(updatedPost);
+	} catch (error) {
+		next(error);
 	}
-	// finding the post that the user wants to like or unlike
-	const post = (await Post.findById(id)) as PostDoc;
-
-	let updatedLikedBy: string[];
-	// checking if the user has already liked this post
-	// if so, then the user's id will be present in likedBy array
-	const postIsLiked = post.likedBy.includes(user._id);
-	// add the user's id if the user hasn't liked the post already
-	if (!postIsLiked) updatedLikedBy = [...post.likedBy, user._id];
-	// remove the user's id from the list if the user has already liked the post
-	else {
-		updatedLikedBy = post.likedBy.filter(userId => userId.toString() !== user._id.toString());
-	}
-	// updating only the likedBy field of the post
-	const updatedPost = await Post.findByIdAndUpdate(id, { likedBy: updatedLikedBy }, { new: true });
-
-	await Post.populate(updatedPost, config.POST_POPULATE_OPTIONS);
-
-	response.json(updatedPost);
 }
 
 export async function deletePost(
 	request: Request<ParamsDictionary, any, any, { page: string }>,
-	response: Response
+	response: Response,
+	next: NextFunction
 ) {
 	const user = request.user!;
 	const { id } = request.params;
-	// checking if any post with the id exists
-	const postExists = await Post.exists({ _id: id });
+	try {
+		// checking if any post with the id exists
+		const postExists = await Post.exists({ _id: id });
 
-	if (!postExists) {
-		return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+		if (!postExists) {
+			return response.status(404).json({ errorMessage: 'No post exists with the given id' });
+		}
+		// deleting the post doc from the database
+		await Post.findByIdAndDelete(id);
+		// removing the post id from the user's posts array
+		user.posts = user.posts.filter(postId => postId !== id);
+		await user.save();
+		// Need to send a list of paginated posts
+		const page = Number.parseFloat(request.query.page);
+		const posts = await getPaginatedPosts(page);
+		const total = await Post.countDocuments({});
+
+		response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
+	} catch (error) {
+		next(error);
 	}
-	// deleting the post doc from the database
-	await Post.findByIdAndDelete(id);
-	// removing the post id from the user's posts array
-	user.posts = user.posts.filter(postId => postId !== id);
-	await user.save();
-	// Need to send a list of paginated posts
-	const page = Number.parseFloat(request.query.page);
-	const posts = await getPaginatedPosts(page);
-	const total = await Post.countDocuments({});
-
-	response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
 }

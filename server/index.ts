@@ -6,6 +6,7 @@ import cors from 'cors';
 import postRoutes from './routes/posts';
 import userRoutes from './routes/user';
 import { OAuth2Client } from 'google-auth-library';
+import handleError from './middleware/handleError';
 
 // create an express app
 const app = express();
@@ -43,6 +44,9 @@ app.use('/user', userRoutes);
 app.use((request: Request, response: Response) => {
 	response.status(404).json({ errorMessage: 'The url does not exist' });
 });
+
+// applying the error-handler middleware
+app.use(handleError);
 
 // listen for requests on the specified port
 app.listen(config.PORT, () => {

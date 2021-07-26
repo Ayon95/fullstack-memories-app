@@ -9,8 +9,6 @@ import { RootState } from '../redux/store';
 import SearchForm from '../components/Forms/SearchForm';
 import Pagination from '../components/Pagination/Pagination';
 import stylesConfig from '../utils/stylesConfig';
-import { checkExpiredToken, logOut, startLogoutTimer } from '../utils/helpers';
-import { logoutTimerId } from '../redux/slices/auth/authThunks';
 
 function Home() {
 	const dispatch = useDispatch();

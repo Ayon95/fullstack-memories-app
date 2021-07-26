@@ -32,7 +32,7 @@ export async function logIn(request: Request, response: Response) {
 		// the token payload contains necessary user information that the server can later use to verify the user who made the request
 		// the token expires in 1 hours
 		const payload = { email: user.email, id: user._id };
-		const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '15000' });
+		const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '2h' });
 
 		response.json({
 			token,
@@ -67,7 +67,7 @@ export async function signUp(request: Request, response: Response) {
 		});
 		// generating a signed token
 		const payload = { email: newUser.email, id: newUser._id };
-		const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '15000' });
+		const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '2h' });
 
 		response.json({
 			token,

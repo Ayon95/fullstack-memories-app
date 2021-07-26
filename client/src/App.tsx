@@ -23,7 +23,6 @@ function App() {
 		if (tokenIsExpired) logOut(dispatch);
 		// start a new logout timer with the updated remaining time
 		else startLogoutTimer(logoutTimerId, dispatch, token);
-		console.log('logout timer update');
 	}, [dispatch, token]);
 	return (
 		<>

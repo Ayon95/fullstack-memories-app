@@ -61,8 +61,6 @@ export function startLogoutTimer(timerId: number, dispatch: Dispatch<any>, token
 	// calculating the remaining time - the token will expire after this remaining time
 	// the remaining time is equal to the difference between some time in the future (expirationTime) and the current time
 	const remainingTime = decodedToken.exp! * 1000 - Date.now();
-	console.log('remaining time', remainingTime / 1000);
-	console.log('logout timer started');
 	// the timer will finish its countdown after this remainingTime, and the user will be logged out
 	timerId = window.setTimeout(() => logOut(dispatch), remainingTime);
 }

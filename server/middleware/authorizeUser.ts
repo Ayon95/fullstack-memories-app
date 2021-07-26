@@ -85,8 +85,7 @@ async function authorizeUser(request: Request, response: Response, next: NextFun
 		// execute the next middleware
 		next();
 	} catch (error) {
-		console.error(error);
-		return response.status(401).json({ errorMessage: 'Invalid token provided' });
+		next(error);
 	}
 }
 
