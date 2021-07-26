@@ -32,42 +32,22 @@ export async function getPostsBySearch(
 ) {
 	try {
 		// getting the query params
-		const { page, searchTerm, tags } = request.query;
+		const { searchTerm, tags } = request.query;
 		// converting the searchTerm to a regex, and making it case-insensitive
 		// since it is a regex, mongoose will simply check whether the title field value matches this regex
 		const title = new RegExp(searchTerm, 'i');
 		// converting the tags string into an array
 		const tagsArray = tags.split(',');
 
-		// if page is 'all', then return all the posts that match the search criteria (no need to paginate)
-		if (page === 'all') {
-			// getting the posts where either their title matches the search term
-			// or one of their tags is present in the list of tags that were passed
-			// if both search term and tags are specified, then all posts satisfying any of the two conditions will be selected
-			const allPosts = await Post.find({
-				$or: [{ title: title }, { tags: { $in: tagsArray } }],
-			})
-				.sort({ _id: -1 })
-				.populate(config.POST_POPULATE_OPTIONS);
-			return response.json({ posts: allPosts, totalNumPages: 0 });
-		}
-
-		const startIndex = (Number.parseFloat(page) - 1) * config.POSTS_PER_PAGE;
-		// getting the total number of search results
-		const total = await Post.countDocuments({
-			$or: [{ title: title }, { tags: { $in: tagsArray } }],
-		});
-
-		// skipping to the first item of the specified page and only getting the specified number of pages
+		// getting the posts where either their title matches the search term
+		// or one of their tags is present in the list of tags that were passed
+		// if both search term and tags are specified, then all posts satisfying any of the two conditions will be selected
 		const posts = await Post.find({
 			$or: [{ title: title }, { tags: { $in: tagsArray } }],
 		})
-			.skip(startIndex)
-			.limit(config.POSTS_PER_PAGE)
 			.sort({ _id: -1 })
 			.populate(config.POST_POPULATE_OPTIONS);
-
-		response.json({ posts, totalNumPages: Math.ceil(total / config.POSTS_PER_PAGE) });
+		return response.json(posts);
 	} catch (error) {
 		next(error);
 	}

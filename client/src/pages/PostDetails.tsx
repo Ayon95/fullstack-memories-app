@@ -36,7 +36,6 @@ function PostDetails() {
 		dispatch(
 			getPostsBySearch({
 				token: currentUser.token,
-				page: 'all',
 				searchTerm: 'none',
 				tags: post.tags.join(','),
 			})

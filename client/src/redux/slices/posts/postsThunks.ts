@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { BasePost, ErrorObj, PaginatedPostsResponse, Post } from '../../../utils/types';
 
-const baseUrl = 'http://localhost:5000/posts';
+const baseUrl = '/posts';
 
 /* thunk creator that will be responsible for fetching all the posts from the backend
 Specified a few generic arguments because I need to use thunkAPI in the payload creator:
@@ -49,16 +49,16 @@ export const getPost = createAsyncThunk<
 
 // thunk creator responsible for sending a GET request to get posts based on the search query
 export const getPostsBySearch = createAsyncThunk<
-	PaginatedPostsResponse,
-	{ token: string; page: string; searchTerm: string; tags: string },
+	Post[],
+	{ token: string; searchTerm: string; tags: string },
 	{ rejectValue: string }
 >('posts/getPostsBySearch', async (requestData, thunkAPI) => {
 	// specifying two query parameters -> searchTerm and tags
 	const response = await fetch(
 		// the url will look something like -> http://localhost:5000/posts/search?page=1&searchTerm=niagara&tags=niagara,canada,usa
-		`${baseUrl}/search?page=${requestData.page}&searchTerm=${
-			requestData.searchTerm || 'none'
-		}&tags=${requestData.tags || 'none'}`,
+		`${baseUrl}/search?searchTerm=${requestData.searchTerm || 'none'}&tags=${
+			requestData.tags || 'none'
+		}`,
 		{
 			method: 'GET',
 			headers: { Authorization: `Bearer ${requestData.token}` },
@@ -70,7 +70,7 @@ export const getPostsBySearch = createAsyncThunk<
 		return thunkAPI.rejectWithValue(error.errorMessage);
 	}
 
-	const data = (await response.json()) as PaginatedPostsResponse;
+	const data = (await response.json()) as Post[];
 	return data;
 });
 

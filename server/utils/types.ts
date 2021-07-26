@@ -71,7 +71,6 @@ export interface GoogleUserDoc extends BaseUserDoc {
 export type SearchQuery = {
 	searchTerm: string;
 	tags: string;
-	page: string;
 };
 
 // shape of getPost params object

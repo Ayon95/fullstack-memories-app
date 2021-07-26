@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { startLogoutTimer } from '../../../utils/helpers';
 import { ErrorObj, User, UserRequestBody } from '../../../utils/types';
 
-const baseUrl = 'http://localhost:5000/user';
+const baseUrl = '/user';
 export let logoutTimerId: number;
 
 // this thunk will be responsible for sending a POST request to create a new user

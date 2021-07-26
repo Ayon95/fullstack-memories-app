@@ -6,7 +6,7 @@ import {
 	isRejectedAction,
 	isUpdateFulfilledAction,
 } from '../../matchers';
-import { addComment, getPost } from './postsThunks';
+import { addComment, getPost, getPostsBySearch } from './postsThunks';
 
 const initialState: PostsSliceState = {
 	postItems: [],
@@ -40,6 +40,12 @@ const postsSlice = createSlice({
 			state.detailedPost = action.payload;
 		});
 
+		builder.addCase(getPostsBySearch.fulfilled, (state, action) => {
+			state.status = 'success';
+			state.postItems = action.payload;
+			state.totalNumPages = 0;
+		});
+
 		// action.payload will be the post object containing the new comment
 		builder.addCase(addComment.fulfilled, (state, action) => {
 			state.status = 'success';
@@ -58,7 +64,7 @@ const postsSlice = createSlice({
 			state.error = '';
 		});
 
-		// this matcher matches all the fulfilled actions that result in a list of paginated posts (getPosts, getPostsBySearch, createPost, deletePost)
+		// this matcher matches all the fulfilled actions that result in a list of paginated posts (getPosts, createPost, deletePost)
 		builder.addMatcher(
 			isPaginatedFulfilledAction,
 			(state, action: PayloadAction<PaginatedPostsResponse>) => {

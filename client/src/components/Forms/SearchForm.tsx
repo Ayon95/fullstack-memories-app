@@ -20,7 +20,6 @@ function SearchForm() {
 	const status = useSelector((state: RootState) => state.posts.status);
 	const token = useSelector((state: RootState) => state.auth.user!.token);
 	const posts = useSelector((state: RootState) => state.posts.postItems);
-	const currentPage = useSelector((state: RootState) => state.posts.currentPage);
 
 	const dispatch = useDispatch();
 	const history = useHistory();
@@ -28,18 +27,18 @@ function SearchForm() {
 
 	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
+		setValidationError('');
 		// if neither a title nor tags are provided then simply return
 		if (!title && tags.length === 0)
 			return setValidationError('Neither a title nor a tag was provided');
 		dispatch(
 			getPostsBySearch({
 				token,
-				page: currentPage.toString(),
 				searchTerm: title,
 				tags: tags.join(','),
 			})
 		);
-		history.push('/home/search');
+		history.push(`/home/search?searchTerm=${title}&tags=${tags.join(',') || 'none'}`);
 	}
 
 	// this function will grab the unfiltered posts (not filtered by search criteria)
@@ -84,7 +83,9 @@ function SearchForm() {
 				)}
 			</div>
 			{location.pathname.includes('search') && (
-				<SearchResultsText>Found {posts.length || 'No'} results</SearchResultsText>
+				<SearchResultsText>
+					Found {posts.length || 'No'} {posts.length === 1 ? 'result' : 'results'}
+				</SearchResultsText>
 			)}
 		</FormWrapper>
 	);

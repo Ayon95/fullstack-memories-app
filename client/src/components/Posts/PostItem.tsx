@@ -124,6 +124,7 @@ const PostDetailsLink = styled(Link)`
 
 const PostWrapper = styled.article`
 	border-radius: 1rem;
+	max-height: 60rem;
 	overflow: hidden;
 	box-shadow: ${stylesConfig.shadowThin};
 	display: flex;
