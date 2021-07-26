@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import NativeUser from '../models/User/NativeUser';
 import { NativeUserDoc, UserCredentials, UserSignupRequest } from '../utils/types';
 import bcrypt from 'bcrypt';
@@ -7,12 +7,18 @@ import config from '../utils/config';
 import { TokenPayload } from 'google-auth-library';
 import GoogleUser from '../models/User/GoogleUser';
 import { googleOAuthClient } from '../index';
+import {
+	DuplicateUserError,
+	NonexistentResourceError,
+	PasswordError,
+	RequiredFieldError,
+} from '../utils/error';
 
-export async function logIn(request: Request, response: Response) {
+export async function logIn(request: Request, response: Response, next: NextFunction) {
 	const userCredentials: UserCredentials = request.body;
 	// checking if both the email and password have been provided
 	if (![userCredentials.email, userCredentials.password].every(Boolean)) {
-		return response.status(400).json({ errorMessage: 'Email or password is missing' });
+		throw new RequiredFieldError();
 	}
 
 	try {
@@ -20,12 +26,12 @@ export async function logIn(request: Request, response: Response) {
 		const user = await NativeUser.findOne({ email: userCredentials.email });
 		// checking whether such a user exists or not
 		if (!user) {
-			return response.status(404).json({ errorMessage: 'No user with this email exists' });
+			throw new NonexistentResourceError('No user exists with the given email');
 		}
 		// checking if the user provided the correct password
 		const passwordIsCorrect = await bcrypt.compare(userCredentials.password, user.passwordHash);
 		if (!passwordIsCorrect) {
-			return response.status(401).json({ errorMessage: 'Incorrect password provided' });
+			throw new PasswordError();
 		}
 
 		// generating a digitally-signed token containing the specified payload and signed with the secret string
@@ -41,19 +47,19 @@ export async function logIn(request: Request, response: Response) {
 			lastName: user.lastName,
 			posts: user.posts,
 		});
-	} catch {
-		response.status(500).json({ errorMessage: 'Internal server error' });
+	} catch (error) {
+		next(error);
 	}
 }
 
-export async function signUp(request: Request, response: Response) {
+export async function signUp(request: Request, response: Response, next: NextFunction) {
 	const userData: UserSignupRequest = request.body;
 
 	try {
 		// checking if a user already exists with the provided email
 		const existingUser = await NativeUser.findOne({ email: userData.email });
 		if (existingUser) {
-			return response.status(400).json({ errorMessage: 'A user with this email already exists' });
+			throw new DuplicateUserError();
 		}
 		// generating a password hash with the specified number of salt rounds
 		const passwordHash = await bcrypt.hash(userData.password, 12);
@@ -69,19 +75,19 @@ export async function signUp(request: Request, response: Response) {
 		const payload = { email: newUser.email, id: newUser._id };
 		const token = jwt.sign(payload, config.JWT_SECRET, { expiresIn: '2h' });
 
-		response.json({
+		response.status(201).json({
 			token,
 			userId: newUser._id,
 			firstName: newUser.firstName,
 			lastName: newUser.lastName,
 			posts: newUser.posts,
 		});
-	} catch {
-		response.status(500).json({ errorMessage: 'Internal server error' });
+	} catch (error) {
+		next(error);
 	}
 }
 
-export async function logInGoogle(request: Request, response: Response) {
+export async function logInGoogle(request: Request, response: Response, next: NextFunction) {
 	try {
 		const { token } = request.body;
 
@@ -119,7 +125,7 @@ export async function logInGoogle(request: Request, response: Response) {
 				posts: [],
 			});
 
-			response.json({
+			response.status(201).json({
 				token,
 				userId: newUser._id,
 				firstName: newUser.firstName,
@@ -128,7 +134,6 @@ export async function logInGoogle(request: Request, response: Response) {
 			});
 		}
 	} catch (error) {
-		console.log(error);
-		response.status(401).json({ errorMessage: 'Invalid ID token provided' });
+		next(error);
 	}
 }

@@ -5,7 +5,7 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import Comment from '../models/Comment';
 import Post from '../models/Post';
 import config from '../utils/config';
-import { NonexistentPostError, RequiredFieldError } from '../utils/error';
+import { NonexistentResourceError, RequiredFieldError } from '../utils/error';
 import { getPaginatedPosts } from '../utils/helpers';
 import { BasePost, GetPostParams, PostDoc, SearchQuery } from '../utils/types';
 
@@ -84,7 +84,7 @@ export async function getPost(
 		const post = await Post.findById(id).populate(config.POST_POPULATE_OPTIONS);
 
 		if (!post) {
-			throw new NonexistentPostError();
+			throw new NonexistentResourceError('No post exists with the given id');
 		}
 
 		return response.json(post);
@@ -139,7 +139,7 @@ export async function addComment(
 	try {
 		const post = await Post.findById(id);
 		if (!post) {
-			throw new NonexistentPostError();
+			throw new NonexistentResourceError('No post exists with the given id');
 		}
 
 		const newComment = await Comment.create({
@@ -169,7 +169,7 @@ export async function updatePost(request: Request, response: Response, next: Nex
 		// checking if any post exists with the given id
 		const postExists = await Post.exists({ _id: id });
 		if (!postExists) {
-			throw new NonexistentPostError();
+			throw new NonexistentResourceError('No post exists with the given id');
 		}
 		// checking if a required field is missing
 		if (![post.title, post.description].every(Boolean)) {
@@ -194,7 +194,7 @@ export async function updateLikes(request: Request, response: Response, next: Ne
 		// checking whether the post exists or not
 		const postExists = await Post.exists({ _id: id });
 		if (!postExists) {
-			throw new NonexistentPostError();
+			throw new NonexistentResourceError('No post exists with the given id');
 		}
 		// finding the post that the user wants to like or unlike
 		const post = (await Post.findById(id)) as PostDoc;
@@ -236,7 +236,7 @@ export async function deletePost(
 		const postExists = await Post.exists({ _id: id });
 
 		if (!postExists) {
-			throw new NonexistentPostError();
+			throw new NonexistentResourceError('No post exists with the given id');
 		}
 		// deleting the post doc from the database
 		await Post.findByIdAndDelete(id);

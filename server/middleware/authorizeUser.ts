@@ -20,6 +20,7 @@ import { TokenPayload } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import GoogleUser from '../models/User/GoogleUser';
 import config from '../utils/config';
+import { AuthHeaderError, NonexistentResourceError } from '../utils/error';
 // import { TokenPayload } from '../utils/types';
 import { googleOAuthClient } from './../index';
 import NativeUser from './../models/User/NativeUser';
@@ -31,9 +32,7 @@ async function authorizeUser(request: Request, response: Response, next: NextFun
 		// checking if the header value exists and if it is using the Bearer scheme
 		// if there is no Authorization header value, then that means there's no token
 		if (!authHeaderValue || !authHeaderValue.toLowerCase().startsWith('bearer')) {
-			return response.status(400).json({
-				errorMessage: 'Authorization header is missing, or it does not have a Bearer token',
-			});
+			throw new AuthHeaderError();
 		}
 		// extract the token from the auth header value
 		const token = authHeaderValue.split(' ')[1];
@@ -52,9 +51,7 @@ async function authorizeUser(request: Request, response: Response, next: NextFun
 			const nativeUser = await NativeUser.findById(decodedPayload.id);
 
 			if (!nativeUser) {
-				return response
-					.status(401)
-					.json({ errorMessage: 'The user needs to be logged-in to perform this action' });
+				throw new NonexistentResourceError('No user exists for the given credentials');
 			}
 
 			// storing the user in the request object by creating a 'user' property on it
@@ -74,9 +71,7 @@ async function authorizeUser(request: Request, response: Response, next: NextFun
 			const googleUser = await GoogleUser.findOne({ googleId: decodedPayload.sub });
 
 			if (!googleUser) {
-				return response
-					.status(401)
-					.json({ errorMessage: 'The user needs to be logged-in to perform this action' });
+				throw new NonexistentResourceError('No user exists for the given credentials');
 			}
 
 			request.user = googleUser;
