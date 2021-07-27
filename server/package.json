@@ -3,6 +3,10 @@
 	"version": "1.0.0",
 	"description": "server application for Memories app",
 	"main": "index.js",
+	"engines": {
+		"node": "14.15.4",
+		"npm": "6.14.10"
+	},
 	"scripts": {
 		"start": "nodemon index.ts",
 		"build": "tsc --project ./",
