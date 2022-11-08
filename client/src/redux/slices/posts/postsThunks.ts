@@ -1,7 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { BasePost, ErrorObj, PaginatedPostsResponse, Post } from '../../../utils/types';
 
-const baseUrl = 'https://memories-app-mushfiq.herokuapp.com/posts';
+// old heroku deploy url - https://memories-app-mushfiq.herokuapp.com/posts
+const baseUrl = 'https://memories-app-910c.onrender.com/posts';
 
 /* thunk creator that will be responsible for fetching all the posts from the backend
 Specified a few generic arguments because I need to use thunkAPI in the payload creator:

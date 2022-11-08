@@ -1,8 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { startLogoutTimer } from '../../../utils/helpers';
 import { ErrorObj, User, UserRequestBody } from '../../../utils/types';
-
-const baseUrl = 'https://memories-app-mushfiq.herokuapp.com/user';
+// old heroku deploy url - https://memories-app-mushfiq.herokuapp.com/user
+const baseUrl = 'https://memories-app-910c.onrender.com/user';
 export let logoutTimerId: number;
 
 // this thunk will be responsible for sending a POST request to create a new user
