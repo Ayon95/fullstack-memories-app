@@ -18,7 +18,7 @@ function Comments() {
 
 	function handleSubmitComment(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		if (!comment) return console.log('comment is missing');
+		if (!comment) return;
 		dispatch(addComment({ id: post._id, token, comment }));
 		setComment('');
 	}

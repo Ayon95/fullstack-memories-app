@@ -28,8 +28,6 @@ function PostDetails() {
 			postItem.tags.some(tag => post?.tags.includes(tag))
 	);
 
-	console.log(postItems);
-
 	// get the post whose details page the user wants to see
 	useEffect(() => {
 		dispatch(getPost({ token: currentUser.token, id }));

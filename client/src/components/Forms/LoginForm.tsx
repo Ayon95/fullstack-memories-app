@@ -14,6 +14,7 @@ function LoginForm() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [validationError, setValidationError] = useState('');
+	const [googleLoginError, setGoogleLoginError] = useState('');
 	const error = useSelector((state: RootState) => state.auth.error);
 
 	const dispatch = useDispatch();
@@ -38,7 +39,7 @@ function LoginForm() {
 	}
 
 	function handleGoogleLoginFailure(response: GoogleLoginFailedResponse) {
-		console.log('Failed to log in with Google', response.error);
+		setGoogleLoginError(response.error);
 	}
 	return (
 		<FormWrapper title="Log In" handleSubmit={handleSubmit} style={{ width: '38rem' }}>
@@ -62,6 +63,7 @@ function LoginForm() {
 
 			{error && <ErrorMessage text={error} />}
 			{validationError && <ErrorMessage text={validationError} />}
+			{googleLoginError && <ErrorMessage text={googleLoginError} />}
 
 			<Button
 				text="Log In"
