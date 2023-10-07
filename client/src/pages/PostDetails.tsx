@@ -22,8 +22,13 @@ function PostDetails() {
 
 	// here we are filtering out the post itself (we only want other posts that are related to it)
 	const recommendedPosts = postItems?.filter(
-		post => post._id !== id && post.author._id !== currentUser!.userId
+		postItem =>
+			postItem._id !== id &&
+			postItem.author._id !== currentUser!.userId &&
+			postItem.tags.some(tag => post?.tags.includes(tag))
 	);
+
+	console.log(postItems);
 
 	// get the post whose details page the user wants to see
 	useEffect(() => {
@@ -45,7 +50,7 @@ function PostDetails() {
 	return (
 		<Layout>
 			{status === 'pending' && <LoadingSpinner />}
-			{post && (
+			{status !== 'pending' && post && (
 				<PostDetailsContainer>
 					<TextContent>
 						<Tags>#{post.tags.join(' #')}</Tags>
@@ -67,7 +72,9 @@ function PostDetails() {
 					<PostImage src={`data:image/png;base64,${post.selectedFile}`} alt={post.title} />
 				</PostDetailsContainer>
 			)}
-			{recommendedPosts.length > 0 && <RecommendedPosts posts={recommendedPosts} />}
+			{status !== 'pending' && recommendedPosts.length > 0 && (
+				<RecommendedPosts posts={recommendedPosts} />
+			)}
 		</Layout>
 	);
 }

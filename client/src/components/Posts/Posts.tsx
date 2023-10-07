@@ -20,7 +20,7 @@ function Posts() {
 	return (
 		<PostsContainer>
 			{postsStatus === 'pending' && <LoadingSpinner />}
-			{posts && posts.map(post => <Post key={post._id} post={post} />)}
+			{postsStatus !== 'pending' && posts && posts.map(post => <Post key={post._id} post={post} />)}
 		</PostsContainer>
 	);
 }
